@@ -1,7 +1,7 @@
 /* Panduan Ibadah — Service Worker (offline penuh)
    v5: precache teras + downloader aset dikendalikan oleh halaman (index.html).
    Jika tambah/ubah fail, naikkan nombor versi di bawah. */
-const CACHE = 'panduan-wirid-dan-doa';
+const CACHE = 'panduan-wirid-dan-doa-v6';
 
 importScripts('./precache-manifest.js'); // sediakan self.APP_CORE & self.APP_ASSETS
 

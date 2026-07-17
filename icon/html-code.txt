@@ -1,0 +1,65 @@
+===============================================
+WIRID & DOA — ICON SET: HTML CODE
+===============================================
+
+1) Letak dalam <head> di index.html:
+-----------------------------------------------
+<!-- Favicon -->
+<link rel="icon" href="icon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+
+<!-- Apple Touch Icons (iPhone / iPad) -->
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="152x152" href="apple-touch-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="167x167" href="apple-touch-icon-167x167.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon-180x180.png">
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#04270C">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Wirid & Doa">
+
+
+2) Letak dalam manifest.json ("icons" array):
+-----------------------------------------------
+"icons": [
+  {
+    "src": "icon-192.png",
+    "sizes": "192x192",
+    "type": "image/png",
+    "purpose": "any"
+  },
+  {
+    "src": "icon-512.png",
+    "sizes": "512x512",
+    "type": "image/png",
+    "purpose": "any"
+  },
+  {
+    "src": "icon-maskable-192.png",
+    "sizes": "192x192",
+    "type": "image/png",
+    "purpose": "maskable"
+  },
+  {
+    "src": "icon-maskable-512.png",
+    "sizes": "512x512",
+    "type": "image/png",
+    "purpose": "maskable"
+  }
+],
+"theme_color": "#04270C",
+"background_color": "#04270C"
+
+
+NOTA:
+- Jika icon disimpan dalam subfolder (contoh: /icons/), tambah path
+  tu dalam semua "href" dan "src" di atas.
+- Warna #04270C ialah hijau gelap yang disample terus dari icon.
+- Fail *-precomposed.png untuk device iOS lama (iOS < 7) —
+  tak perlu link dalam HTML, browser cari sendiri di root.
+- Jangan lupa tambah fail icon baru dalam senarai cache
+  service worker dan naikkan versi cache.

@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Panduan Ibadah</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0a1208">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ibadah">
+<meta name="description" content="Panduan doa dalam solat, wirid & zikir selepas solat, dan doa-doa harian.">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon-180.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Amiri:wght@400;700&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Inter',sans-serif;background:#0a1208;color:#e8f5e8;min-height:100vh;overflow:hidden;}
+  .view{position:fixed;inset:0;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity 0.35s ease,transform 0.35s ease;}
+  .view.active{opacity:1;pointer-events:all;transform:none;}
+  .view.slide-up{transform:translateY(100%);}
+
+  #v-landing{background:linear-gradient(160deg,#0a1a0a,#060f06);align-items:center;justify-content:center;gap:28px;}
+  .landing-title{font-size:1.4rem;font-weight:700;color:#7bc47b;text-transform:uppercase;letter-spacing:2px;text-align:center;}
+  .landing-sub{font-size:0.75rem;color:#3a6b3a;letter-spacing:0.5px;margin-top:-20px;}
+  .landing-cards{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;padding:0 20px;}
+  .land-btn{width:150px;height:168px;border-radius:18px;border:1px solid;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;cursor:pointer;transition:all 0.25s;}
+  .land-btn:hover{transform:translateY(-5px);box-shadow:0 20px 50px rgba(0,0,0,0.6);}
+  .land-btn.solat{background:linear-gradient(145deg,#0d2233,#091929);border-color:#1a4a6a;}
+  .land-btn.solat:hover{border-color:#2196f3;}
+  .land-btn.wirid{background:linear-gradient(145deg,#162b16,#0f220f);border-color:#2d5a2d;}
+  .land-btn.wirid:hover{border-color:#4caf50;}
+  .land-btn.harian{background:linear-gradient(145deg,#0d2626,#091a1a);border-color:#1a5a5a;}
+  .land-btn.harian:hover{border-color:#00bcd4;}
+  .btn-icon{font-size:2.5rem;}
+  .btn-lbl{font-size:0.8rem;font-weight:600;text-align:center;line-height:1.35;}
+  .btn-lbl.solat{color:#64b5f6;}
+  .btn-lbl.wirid{color:#81c784;}
+  .btn-lbl.harian{color:#4dd0d0;}
+  .btn-cnt{font-size:0.6rem;opacity:0.55;text-align:center;margin-top:2px;}
+
+  #v-grid{flex-direction:column;}
+  .grid-header{padding:12px 16px 11px 52px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid;flex-shrink:0;position:relative;}
+  .grid-header.solat{background:linear-gradient(135deg,#0d2233,#091929);border-color:#1a4a6a;}
+  .grid-header.harian{background:linear-gradient(135deg,#0d2626,#091a1a);border-color:#1a5a5a;}
+  .grid-title{font-size:0.8rem;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;}
+  .grid-title.solat{color:#64b5f6;}
+  .grid-title.harian{color:#4dd0d0;}
+  .grid-sub{font-size:0.7rem;opacity:0.5;}
+  .grid-scroll{flex:1;overflow-y:auto;padding:16px;display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:12px;align-content:start;scrollbar-width:thin;}
+  .grid-scroll.solat{scrollbar-color:#1a4a6a transparent;}
+  .grid-scroll.harian{scrollbar-color:#1a5a5a transparent;}
+  .grid-card{border-radius:14px;padding:14px 13px;cursor:pointer;display:flex;flex-direction:column;gap:7px;border:1px solid;transition:all 0.2s;min-height:85px;}
+  .grid-card.solat{background:linear-gradient(145deg,#0f2030,#091929);border-color:#1a4a6a;}
+  .grid-card.solat:hover{border-color:#2196f3;transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.4);}
+  .grid-card.harian{background:linear-gradient(145deg,#0d2626,#091a1a);border-color:#1a5a5a;}
+  .grid-card.harian:hover{border-color:#00bcd4;transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.4);}
+  .gc-num{font-size:0.6rem;font-weight:700;opacity:0.45;}
+  .gc-tajuk{font-size:0.76rem;font-weight:600;line-height:1.3;}
+  .gc-tajuk.solat{color:#90caf9;}
+  .gc-tajuk.harian{color:#80deea;}
+  .gc-step{font-size:0.58rem;padding:2px 6px;border-radius:8px;width:fit-content;margin-top:2px;}
+  .gc-step.solat{background:rgba(33,150,243,0.15);color:#64b5f6;border:1px solid rgba(33,150,243,0.25);}
+
+  #v-card{flex-direction:column;}
+  .card-header2{padding:11px 16px 11px 52px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid;flex-shrink:0;position:relative;}
+  .card-header2.solat{background:linear-gradient(135deg,#0d2233,#091929);border-color:#1a4a6a;}
+  .card-header2.wirid{background:linear-gradient(135deg,#1a3a1a,#0d2b0d);border-color:#2d5a2d;}
+  .card-header2.harian{background:linear-gradient(135deg,#0d2626,#091a1a);border-color:#1a5a5a;}
+  .hdr-title{font-size:0.78rem;font-weight:600;text-transform:uppercase;letter-spacing:1.2px;}
+  .hdr-title.solat{color:#64b5f6;}
+  .hdr-title.wirid{color:#7bc47b;}
+  .hdr-title.harian{color:#4dd0d0;}
+  .hdr-prog{font-size:0.7rem;opacity:0.55;}
+  .btn-back{position:absolute;left:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:0.95rem;padding:6px 8px;border-radius:8px;color:#aaa;transition:background 0.2s;white-space:nowrap;}
+  .btn-back:hover{background:rgba(255,255,255,0.08);color:#fff;}
+  .pb-wrap{height:3px;flex-shrink:0;}
+  .pb-wrap.solat{background:#091929;}
+  .pb-wrap.wirid{background:#1a3a1a;}
+  .pb-wrap.harian{background:#091a1a;}
+  .pb-fill{height:100%;transition:width 0.4s ease;}
+  .pb-fill.solat{background:linear-gradient(90deg,#2196f3,#64b5f6);}
+  .pb-fill.wirid{background:linear-gradient(90deg,#4caf50,#81c784);}
+  .pb-fill.harian{background:linear-gradient(90deg,#00bcd4,#4dd0e1);}
+
+  .card-viewport{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;}
+  .card{position:absolute;width:100%;height:100%;max-height:none;border-radius:0;display:flex;flex-direction:column;overflow:hidden;transition:transform 0.35s cubic-bezier(0.4,0,0.2,1),opacity 0.35s ease;box-shadow:0 20px 60px rgba(0,0,0,0.6);}
+  .card.solat{background:linear-gradient(160deg,#0f2030,#091929);border:1px solid #1a4a6a;}
+  .card.wirid{background:linear-gradient(160deg,#162b16,#0f220f);border:1px solid #2d5a2d;}
+  .card.harian{background:linear-gradient(160deg,#0d2626,#091a1a);border:1px solid #1a5a5a;}
+  .card.out-left{transform:translateX(-110%);opacity:0;}
+  .card.out-right{transform:translateX(110%);opacity:0;}
+  .card.in-left{transform:translateX(-110%);opacity:0;}
+  .card.in-right{transform:translateX(110%);opacity:0;}
+  .card.active{transform:translateX(0);opacity:1;}
+
+  .c-header{padding:13px 18px 11px;border-bottom:1px solid;display:flex;align-items:center;gap:12px;flex-shrink:0;}
+  .c-header.solat{background:linear-gradient(135deg,#0d2d47,#091929);border-color:#1a4a6a;}
+  .c-header.wirid{background:linear-gradient(135deg,#1e4d1e,#163616);border-color:#2d5a2d;}
+  .c-header.harian{background:linear-gradient(135deg,#0d3535,#091a1a);border-color:#1a5a5a;}
+  .c-num{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:700;color:#fff;flex-shrink:0;}
+  .c-num.solat{background:linear-gradient(135deg,#2196f3,#1565c0);box-shadow:0 2px 8px rgba(33,150,243,0.4);}
+  .c-num.wirid{background:linear-gradient(135deg,#4caf50,#2e7d32);box-shadow:0 2px 8px rgba(76,175,80,0.4);}
+  .c-num.harian{background:linear-gradient(135deg,#00bcd4,#00838f);box-shadow:0 2px 8px rgba(0,188,212,0.4);}
+  .c-num.bonus{background:linear-gradient(135deg,#f9a825,#e65100);}
+  .c-meta{flex:1;min-width:0;}
+  .c-tajuk{font-size:0.92rem;font-weight:600;line-height:1.2;}
+  .c-tajuk.solat{color:#90caf9;}
+  .c-tajuk.wirid{color:#a5d6a7;}
+  .c-tajuk.harian{color:#80deea;}
+  .c-sub{font-size:0.65rem;margin-top:2px;font-weight:500;text-transform:uppercase;letter-spacing:0.5px;}
+  .c-sub.solat{color:#4db6f5;}
+  .c-sub.wirid{color:#66bb6a;}
+  .c-sub.harian{color:#26c6da;}
+  .step-badge{font-size:0.6rem;font-weight:600;padding:2px 8px;border-radius:10px;text-transform:uppercase;letter-spacing:0.4px;background:rgba(33,150,243,0.15);color:#64b5f6;border:1px solid rgba(33,150,243,0.3);}
+  .c-body{padding:16px 20px;overflow-y:auto;flex:1;scrollbar-width:thin;display:flex;flex-direction:column;}
+  .c-inner{margin:auto 0;width:100%;}
+  .audio-bar{display:flex;align-items:center;gap:10px;margin:0 0 16px;padding:8px 12px;border-radius:12px;background:#0d1f0d;border:1px solid #2d5a2d;}
+  .audio-btn{flex-shrink:0;width:38px;height:38px;border-radius:50%;border:none;cursor:pointer;font-size:0.95rem;line-height:1;display:flex;align-items:center;justify-content:center;background:#2d5a2d;color:#c8e6c9;transition:background .2s;}
+  .audio-btn:hover{background:#3a6a3a;}
+  .audio-btn:active{transform:scale(0.94);}
+  .audio-prog{flex:1;height:6px;border-radius:3px;background:#16301a;overflow:hidden;cursor:pointer;}
+  .audio-prog-fill{height:100%;width:0;background:#66bb6a;border-radius:3px;}
+  .audio-time{flex-shrink:0;font-size:0.72rem;color:#7cb342;font-variant-numeric:tabular-nums;min-width:34px;text-align:right;}
+  .c-body.solat{scrollbar-color:#1a4a6a transparent;}
+  .c-body.wirid{scrollbar-color:#2d5a2d transparent;}
+  .c-body.harian{scrollbar-color:#1a5a5a transparent;}
+  .c-body::-webkit-scrollbar{width:4px;}
+  .c-body::-webkit-scrollbar-thumb{border-radius:2px;}
+  .c-body.solat::-webkit-scrollbar-thumb{background:#1a4a6a;}
+  .c-body.wirid::-webkit-scrollbar-thumb{background:#2d5a2d;}
+  .c-body.harian::-webkit-scrollbar-thumb{background:#1a5a5a;}
+  .arab-img-wrap{background:#fff;border-radius:12px;padding:14px 16px;margin-bottom:14px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,0.4);}
+  .arab-img-wrap img{max-width:100%;height:auto;max-height:250px;object-fit:contain;display:block;margin:0 auto;}
+  .arab-uni-wrap{background:#fff;border-radius:12px;padding:16px 20px;margin-bottom:14px;box-shadow:0 4px 20px rgba(0,0,0,0.4);}
+  .arab-uni-text{font-family:'Amiri','Traditional Arabic',serif;font-size:1.5rem;line-height:2.4;color:#1a1a1a;direction:rtl;text-align:center;}
+  .rumi-sec{border-left:3px solid;border-radius:0 8px 8px 0;padding:10px 14px;margin-bottom:12px;}
+  .rumi-sec.solat{background:rgba(33,150,243,0.07);border-color:#2196f3;}
+  .rumi-sec.wirid{background:rgba(76,175,80,0.07);border-color:#4caf50;}
+  .rumi-sec.harian{background:rgba(0,188,212,0.07);border-color:#00bcd4;}
+  .sec-lbl{font-size:0.6rem;text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:4px;}
+  .sec-lbl.solat{color:#64b5f6;}
+  .sec-lbl.wirid{color:#66bb6a;}
+  .sec-lbl.harian{color:#26c6da;}
+  .rumi-txt{font-size:0.78rem;line-height:1.7;font-style:italic;}
+  .rumi-txt.solat{color:#bbdefb;}
+  .rumi-txt.wirid{color:#c8e6c9;}
+  .rumi-txt.harian{color:#b2ebf2;}
+  .mak-sec{background:rgba(255,255,255,0.03);border-radius:8px;padding:10px 14px;}
+  .mak-txt{font-size:0.78rem;color:#b0bec5;line-height:1.7;}
+
+  .nav-bar2{padding:11px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-shrink:0;}
+  .nav-bar2.solat{background:linear-gradient(0deg,#091929,#091929ee);}
+  .nav-bar2.wirid{background:linear-gradient(0deg,#0d1f0d,#0d1f0dee);}
+  .nav-bar2.harian{background:linear-gradient(0deg,#091a1a,#091a1aee);}
+  .nav-btn{border-radius:50%;width:42px;height:42px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;transition:all 0.2s;flex-shrink:0;border:1px solid;}
+  .nav-btn.solat{background:linear-gradient(135deg,#0d2d47,#091929);border-color:#1a4a6a;color:#64b5f6;}
+  .nav-btn.solat:hover{background:#1a4a6a;color:#fff;transform:scale(1.05);}
+  .nav-btn.wirid{background:linear-gradient(135deg,#1e4d1e,#163616);border-color:#2d5a2d;color:#7bc47b;}
+  .nav-btn.wirid:hover{background:#2d5a2d;color:#fff;transform:scale(1.05);}
+  .nav-btn.harian{background:linear-gradient(135deg,#0d3535,#091a1a);border-color:#1a5a5a;color:#4dd0d0;}
+  .nav-btn.harian:hover{background:#1a5a5a;color:#fff;transform:scale(1.05);}
+  .nav-btn:disabled{opacity:0.3;cursor:default;transform:none!important;}
+  .nav-dots{display:flex;gap:4px;flex-wrap:wrap;justify-content:center;max-width:calc(100vw - 110px);}
+  .dot{width:6px;height:6px;border-radius:50%;cursor:pointer;transition:all 0.2s;flex-shrink:0;}
+  .dot.solat{background:#1a4a6a;}
+  .dot.solat.active{background:#2196f3;transform:scale(1.5);}
+  .dot.wirid{background:#2d5a2d;}
+  .dot.wirid.active{background:#4caf50;transform:scale(1.5);}
+  .dot.harian{background:#1a5a5a;}
+  /* Al-Mathurat (marun) */
+  .land-btn.mathurat{background:linear-gradient(145deg,#2b1015,#1f0b0f);border-color:#5a2630;}
+  .btn-lbl.mathurat{color:#d98a98;}
+  .grid-header.mathurat{background:linear-gradient(135deg,#2b1015,#1f0b0f);border-color:#5a2630;}
+  .grid-title.mathurat{color:#d98a98;}
+  .grid-scroll.mathurat{scrollbar-color:#5a2630 transparent;}
+  .grid-card.mathurat{background:linear-gradient(145deg,#2b1015,#1f0b0f);border-color:#5a2630;}
+  .gc-tajuk.mathurat{color:#e0a0ab;}
+  .card-header2.mathurat{background:linear-gradient(135deg,#2b1015,#1f0b0f);border-color:#5a2630;}
+  .hdr-title.mathurat{color:#d98a98;}
+  .pb-wrap.mathurat{background:#1f0b0f;}
+  .pb-fill.mathurat{background:linear-gradient(90deg,#b03a4e,#d98a98);}
+  .card.mathurat{background:linear-gradient(160deg,#2b1015,#1f0b0f);border:1px solid #5a2630;}
+  .c-header.mathurat{background:linear-gradient(135deg,#3d1a22,#2b1015);border-color:#5a2630;}
+  .c-num.mathurat{background:linear-gradient(135deg,#b03a4e,#7d2230);box-shadow:0 2px 8px rgba(176,58,78,0.4);}
+  .c-tajuk.mathurat{color:#e0a0ab;}
+  .c-sub.mathurat{color:#c75c6e;}
+  .c-body.mathurat{scrollbar-color:#5a2630 transparent;}
+  .rumi-sec.mathurat{background:rgba(176,58,78,0.08);border-color:#b03a4e;}
+  .sec-lbl.mathurat{color:#c75c6e;}
+  .rumi-txt.mathurat{color:#f0c8ce;}
+  .nav-bar2.mathurat{background:linear-gradient(0deg,#1f0b0f,#1f0b0fee);}
+  .nav-btn.mathurat{background:linear-gradient(135deg,#3d1a22,#2b1015);border-color:#5a2630;color:#d98a98;}
+  .dot.mathurat{background:#5a2630;}
+  .audio-bar.mathurat{background:#240e12;border-color:#5a2630;}
+  .audio-bar.mathurat .audio-btn{background:#5a2630;color:#f0c8ce;}
+  .audio-bar.mathurat .audio-prog{background:#3a161c;}
+  .audio-bar.mathurat .audio-prog-fill{background:#c75c6e;}
+  .audio-bar.mathurat .audio-time{color:#c75c6e;}
+  /* Wirid Pendek (lime/mint) */
+  .land-btn.wpendek{background:linear-gradient(145deg,#1c2a10,#141f0d);border-color:#4a5d24;}
+  .land-btn.wpendek:hover{border-color:#9ccc65;}
+  .btn-lbl.wpendek{color:#aed581;}
+  .card-header2.wpendek{background:linear-gradient(135deg,#23320f,#141f0d);border-color:#4a5d24;}
+  .hdr-title.wpendek{color:#aed581;}
+  .pb-wrap.wpendek{background:#141f0d;}
+  .pb-fill.wpendek{background:linear-gradient(90deg,#8bc34a,#cddc39);}
+  .card.wpendek{background:linear-gradient(160deg,#1c2a10,#141f0d);border:1px solid #4a5d24;}
+  .c-header.wpendek{background:linear-gradient(135deg,#2b3d14,#1c2a10);border-color:#4a5d24;}
+  .c-num.wpendek{background:linear-gradient(135deg,#9ccc65,#689f38);box-shadow:0 2px 8px rgba(156,204,101,0.4);}
+  .c-tajuk.wpendek{color:#d4e9a8;}
+  .c-sub.wpendek{color:#aed581;}
+  .c-body.wpendek{scrollbar-color:#4a5d24 transparent;}
+  .c-body.wpendek::-webkit-scrollbar-thumb{background:#4a5d24;}
+  .rumi-sec.wpendek{background:rgba(156,204,101,0.08);border-color:#9ccc65;}
+  .sec-lbl.wpendek{color:#aed581;}
+  .rumi-txt.wpendek{color:#e2eec9;}
+  .nav-bar2.wpendek{background:linear-gradient(0deg,#0d1508,#0d1508ee);}
+  .nav-btn.wpendek{background:linear-gradient(135deg,#2b3d14,#1c2a10);border-color:#4a5d24;color:#aed581;}
+  .nav-btn.wpendek:hover{background:#4a5d24;color:#fff;transform:scale(1.05);}
+  .dot.wpendek{background:#4a5d24;}
+  .dot.wpendek.active{background:#9ccc65;transform:scale(1.5);}
+  .audio-bar.wpendek{background:#131c0b;border-color:#4a5d24;}
+  .audio-bar.wpendek .audio-btn{background:#4a5d24;color:#e2eec9;}
+  .audio-bar.wpendek .audio-prog{background:#1e2a10;}
+  .audio-bar.wpendek .audio-prog-fill{background:#aed581;}
+  .audio-bar.wpendek .audio-time{color:#aed581;}
+  /* Wirid Panjang (emerald) */
+  .land-btn.wpanjang{background:linear-gradient(145deg,#0e2b1f,#0b241a);border-color:#1e5c43;}
+  .land-btn.wpanjang:hover{border-color:#2ecc71;}
+  .btn-lbl.wpanjang{color:#8ee6b8;}
+  .card-header2.wpanjang{background:linear-gradient(135deg,#123f2c,#0b241a);border-color:#1e5c43;}
+  .hdr-title.wpanjang{color:#8ee6b8;}
+  .pb-wrap.wpanjang{background:#0b241a;}
+  .pb-fill.wpanjang{background:linear-gradient(90deg,#27ae60,#7fe0a8);}
+  .card.wpanjang{background:linear-gradient(160deg,#0e2b1f,#0b241a);border:1px solid #1e5c43;}
+  .c-header.wpanjang{background:linear-gradient(135deg,#175339,#0e2b1f);border-color:#1e5c43;}
+  .c-num.wpanjang{background:linear-gradient(135deg,#2ecc71,#1b8a4e);box-shadow:0 2px 8px rgba(46,204,113,0.4);}
+  .c-tajuk.wpanjang{color:#a8f0cb;}
+  .c-sub.wpanjang{color:#35c07a;}
+  .c-body.wpanjang{scrollbar-color:#1e5c43 transparent;}
+  .c-body.wpanjang::-webkit-scrollbar-thumb{background:#1e5c43;}
+  .rumi-sec.wpanjang{background:rgba(46,204,113,0.08);border-color:#2ecc71;}
+  .sec-lbl.wpanjang{color:#35c07a;}
+  .rumi-txt.wpanjang{color:#c9f2dc;}
+  .nav-bar2.wpanjang{background:linear-gradient(0deg,#071a12,#071a12ee);}
+  .nav-btn.wpanjang{background:linear-gradient(135deg,#175339,#0e2b1f);border-color:#1e5c43;color:#8ee6b8;}
+  .nav-btn.wpanjang:hover{background:#1e5c43;color:#fff;transform:scale(1.05);}
+  .dot.wpanjang{background:#1e5c43;}
+  .dot.wpanjang.active{background:#2ecc71;transform:scale(1.5);}
+  .audio-bar.wpanjang{background:#0a2118;border-color:#1e5c43;}
+  .audio-bar.wpanjang .audio-btn{background:#1e5c43;color:#c9f2dc;}
+  .audio-bar.wpanjang .audio-prog{background:#12362a;}
+  .audio-bar.wpanjang .audio-prog-fill{background:#4cd98a;}
+  .audio-bar.wpanjang .audio-time{color:#4cd98a;}
+  /* Audio bar Solat (biru) */
+  .audio-bar.solat{background:#0d1b2a;border-color:#1e3a5c;}
+  .audio-bar.solat .audio-btn{background:#1e3a5c;color:#cfe4f7;}
+  .audio-bar.solat .audio-prog{background:#132840;}
+  .audio-bar.solat .audio-prog-fill{background:#64b5f6;}
+  .audio-bar.solat .audio-time{color:#64b5f6;}
+  .dot.harian.active{background:#00bcd4;transform:scale(1.5);}
+  .dot.bonus-dot{background:#5a3a00;}
+  .dot.bonus-dot.active{background:#f9a825;}
+
+  /* Desktop: card kekal lebar maksimum di tengah (mobile/tablet penuh skrin) */
+  @media (min-width:1025px){
+    .card{width:min(780px,92vw);height:calc(100% - 26px);max-height:calc(100% - 26px);border-radius:18px;}
+  }
+
+  /* Footer */
+  .app-footer{flex-shrink:0;text-align:center;padding:6px 8px;font-size:0.6rem;color:#3a6b3a;background:#060f06;border-top:1px solid #16331c;letter-spacing:0.3px;}
+  .app-footer.land{position:absolute;bottom:0;left:0;right:0;background:transparent;border-top:none;color:#2f5a2f;}
+
+  /* Niat Solat card */
+  .niat-sec-title{font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#4db6f5;margin:20px 0 6px;padding-bottom:5px;border-bottom:1px solid #1a4a6a;}
+  .niat-sec-title.first{margin-top:0;}
+  .niat-note{font-size:0.7rem;color:#9fb6c9;line-height:1.6;background:rgba(33,150,243,0.06);border-left:3px solid #2196f3;border-radius:0 6px 6px 0;padding:8px 11px;margin-bottom:12px;}
+  .niat-item{margin-bottom:16px;}
+  .niat-item-title{font-size:0.82rem;font-weight:600;color:#90caf9;margin-bottom:7px;}
+  .niat-audio-btn{margin-left:8px;width:26px;height:26px;border-radius:50%;border:1px solid #1e3a5c;background:#132840;color:#64b5f6;font-size:0.68rem;cursor:pointer;vertical-align:middle;line-height:1;}
+  .niat-audio-btn:active{background:#1e3a5c;}
+  .niat-item .arab-uni-wrap{margin-bottom:8px;padding:12px 16px;}
+  .niat-item .arab-uni-text{font-size:1.35rem;line-height:2.2;}
+  .niat-item .rumi-sec,.niat-item .mak-sec{margin-bottom:8px;}
+
+  /* Safe-area (notch / Dynamic Island / home indicator) untuk mode standalone */
+  @supports (padding: env(safe-area-inset-top)){
+    #v-landing{padding-top:env(safe-area-inset-top);padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);}
+    .grid-header,.card-header2{padding-top:calc(11px + env(safe-area-inset-top));padding-left:calc(52px + env(safe-area-inset-left));padding-right:calc(16px + env(safe-area-inset-right));}
+    .btn-back{left:calc(12px + env(safe-area-inset-left));}
+    .nav-bar2{padding-left:calc(18px + env(safe-area-inset-left));padding-right:calc(18px + env(safe-area-inset-right));}
+    .app-footer{padding-bottom:calc(6px + env(safe-area-inset-bottom));padding-left:calc(8px + env(safe-area-inset-left));padding-right:calc(8px + env(safe-area-inset-right));}
+  }
+
+  /* ===== Bar Muat Turun Offline ===== */
+  #dlBar{position:fixed;left:12px;right:12px;bottom:12px;z-index:9999;
+    background:linear-gradient(145deg,#122412,#0a1a0a);border:1px solid #2e5a2e;border-radius:14px;
+    padding:10px 14px;display:none;box-shadow:0 6px 24px rgba(0,0,0,0.55);
+    font-size:0.78rem;color:#a8d8a8;max-width:520px;margin:0 auto;
+    padding-bottom:calc(10px + env(safe-area-inset-bottom));}
+  #dlBar.show{display:block;}
+  #dlBar .dl-row{display:flex;align-items:center;gap:10px;}
+  #dlBar .dl-txt{flex:1;min-width:0;line-height:1.35;}
+  #dlBar .dl-title{font-weight:600;color:#7bc47b;}
+  #dlBar .dl-sub{color:#5d8f5d;font-size:0.7rem;}
+  #dlBar button{background:linear-gradient(135deg,#2e7d32,#1b5e20);color:#e8f5e9;border:none;
+    border-radius:9px;padding:8px 14px;font-size:0.75rem;font-weight:600;cursor:pointer;white-space:nowrap;}
+  #dlBar button:disabled{opacity:0.5;cursor:default;}
+  #dlBar .dl-track{height:6px;background:#0d1f0d;border-radius:4px;margin-top:8px;overflow:hidden;display:none;}
+  #dlBar.busy .dl-track{display:block;}
+  #dlBar .dl-fill{height:100%;width:0%;background:linear-gradient(90deg,#2e7d32,#7bc47b);border-radius:4px;transition:width .25s;}
+  #dlBar.done{border-color:#2e7d32;}
+  #dlBar.done .dl-title{color:#8fdc8f;}
+  #dlBar .dl-close{background:none;border:none;color:#5d8f5d;font-size:1rem;padding:2px 6px;cursor:pointer;}
+</style>
+</head>
+<body>
+
+<!-- LANDING -->
+<div class="view active" id="v-landing">
+  <div style="text-align:center">
+    <div class="landing-title">Panduan Ibadah</div>
+    <div class="landing-sub" style="margin-top:6px">Pilih bahagian untuk bermula</div>
+  </div>
+  <div class="landing-cards">
+    <div class="land-btn solat" onclick="openGrid('solat')">
+      <div class="btn-icon">🕌</div>
+      <div>
+        <div class="btn-lbl solat">Doa dalam<br>Solat</div>
+        <div class="btn-cnt" style="color:#64b5f6" id="cntSolat">9 kad</div>
+      </div>
+    </div>
+    <div class="land-btn wpendek" onclick="openDirect('wpendek')">
+      <div class="btn-icon">🌙</div>
+      <div>
+        <div class="btn-lbl wpendek">Wirid &amp; Zikir<br>Selepas Solat (Pendek)</div>
+        <div class="btn-cnt" style="color:#9ccc65" id="cntWPendek">0 kad</div>
+      </div>
+    </div>
+    <div class="land-btn wirid" onclick="openDirect('wirid')">
+      <div class="btn-icon">📿</div>
+      <div>
+        <div class="btn-lbl wirid">Wirid &amp; Zikir<br>Selepas Solat (Biasa)</div>
+        <div class="btn-cnt" style="color:#4caf50" id="cntWirid">34 kad</div>
+      </div>
+    </div>
+    <div class="land-btn wpanjang" onclick="openDirect('wpanjang')">
+      <div class="btn-icon">📗</div>
+      <div>
+        <div class="btn-lbl wpanjang">Wirid &amp; Zikir<br>Selepas Solat (Panjang)</div>
+        <div class="btn-cnt" style="color:#2ecc71" id="cntWPanjang">0 kad</div>
+      </div>
+    </div>
+    <div class="land-btn mathurat" onclick="openDirect('mathurat')">
+      <div class="btn-icon">📖</div>
+      <div>
+        <div class="btn-lbl mathurat">Al-Ma'thurat</div>
+        <div class="btn-cnt" style="color:#c75c6e" id="cntMathurat">0 kad</div>
+      </div>
+    </div>
+    <div class="land-btn harian" onclick="openGrid('harian')">
+      <div class="btn-icon">🤲</div>
+      <div>
+        <div class="btn-lbl harian">Doa-Doa<br>Harian</div>
+        <div class="btn-cnt" style="color:#00bcd4" id="cntHarian">41 kad</div>
+      </div>
+    </div>
+  </div>
+  <div class="app-footer land">© 2025 Aziz Mohamad | Faith Development Division</div>
+</div>
+
+<!-- GRID -->
+<div class="view slide-up" id="v-grid">
+  <div class="grid-header" id="gridHeader">
+    <button class="btn-back" onclick="goLanding()">🏠</button>
+    <span class="grid-title" id="gridTitle"></span>
+    <span class="grid-sub" id="gridSub"></span>
+  </div>
+  <div class="grid-scroll" id="gridScroll"></div>
+  <div class="app-footer">© 2025 Aziz Mohamad | Faith Development Division</div>
+</div>
+
+<!-- CARD -->
+<div class="view slide-up" id="v-card">
+  <div class="card-header2" id="cardHeader2">
+    <button class="btn-back" id="btnBack" onclick="goBack()">← Grid</button>
+    <span class="hdr-title" id="hdrTitle"></span>
+    <span class="hdr-prog" id="hdrProg"></span>
+  </div>
+  <div class="pb-wrap" id="pbWrap"><div class="pb-fill" id="pbFill"></div></div>
+  <div class="card-viewport">
+    <div class="card" id="cardEl"></div>
+  </div>
+  <div class="nav-bar2" id="navBar2">
+    <button class="nav-btn" id="btnPrev" onclick="navigate(-1)">&#8592;</button>
+    <div class="nav-dots" id="navDots"></div>
+    <button class="nav-btn" id="btnNext" onclick="navigate(1)">&#8594;</button>
+  </div>
+  <div class="app-footer">© 2025 Aziz Mohamad | Faith Development Division</div>
+</div>
+
+<script>
+const SOLAT=[{"id": "s1", "tajuk": "Doa Iftitah", "step": "Berdiri", "arab_unicode": "اَللهُ أَكْبَرُ كَبِيرًا وَالْحَمْدُ لِلَّهِ كَثِيرًا وَسُبْحَانَ اللهِ بُكْرَةً وَأَصِيلًا. وَجَّهْتُ وَجْهِيَ لِلَّذِي فَطَرَ السَّمَاوَاتِ وَالْأَرْضَ حَنِيفًا مُسْلِمًا وَمَا أَنَا مِنَ الْمُشْرِكِينَ. إِنَّ صَلَاتِي وَنُسُكِي وَمَحْيَايَ وَمَمَاتِي لِلَّهِ رَبِّ الْعَالَمِينَ. لَا شَرِيكَ لَهُ وَبِذَلِكَ أُمِرْتُ وَأَنَا مِنَ الْمُسْلِمِينَ", "img": "", "rumi": "Allaahu akbar kabiraa walhamdulillaahi katsiiraa, wa subhaanallaahi bukratan wa'ashiilaa. Wajjahtu wajhiya lilladzii fatharas samaawaati wal ardha haniifan musliman wa maa anaa minal musyrikiin. Inna shalaatii wa nusukii wa mahyaaya wa mamaatii lillaahi rabbil 'aalamiin. Laa syariikalahu wa bidzaalika umirtu wa ana minal muslimiin.", "maksud": "Allah Maha Besar lagi sempurna kebesaran-Nya, segala puji hanya kepunyaan Allah, Maha Suci Allah pagi dan petang. Sesungguhnya aku hadapkan wajahku kepada Allah yang telah menciptakan langit dan bumi dengan keadaan lurus dan menyerahkan diri, dan aku bukanlah dari golongan kaum musyrikin. Sesungguhnya solatku, ibadahku, hidup dan matiku hanyalah untuk Allah Tuhan Semesta Alam, yang tidak ada sekutu bagi-Nya. Dengan yang demikian itulah aku diperintahkan dan aku adalah termasuk orang-orang muslim."}, {"id": "s2", "tajuk": "Al-Fatihah", "step": "Berdiri", "arab_unicode": "", "img": "./quran-img/Al-Fatihah.jpg", "rumi": "Bismillahir Rahmanir Rahim. Alhamdul lillahi Rabbil Alamin. Ar Rahmanir Rahim. Maliki Yawmid Din. Iyyaka Na'budu Wa Iyyaka Nasta'in. Ihdinas Siratal Mustaqim. Siratal Lazina An'amta Alayhim Ghayril Maghdubi Alayhim Wa Lad Dallin.", "maksud": "Dengan nama Allah Yang Maha Pengasih lagi Maha Penyayang. Segala puji bagi Allah, Tuhan semesta alam. Yang Maha Pengasih lagi Maha Penyayang. Pemilik hari Pembalasan. Hanya kepada Engkaulah kami menyembah dan hanya kepada Engkaulah kami memohon pertolongan. Bimbinglah kami ke jalan yang lurus. Iaitu jalan orang-orang yang telah Engkau beri nikmat, bukan jalan mereka yang dimurkai dan bukan pula jalan orang-orang yang sesat.", "scroll": true}, {"id": "s3", "tajuk": "Doa Ketika Rukuk", "step": "Rukuk", "arab_unicode": "سُبْحَانَ رَبِّيَ الْعَظِيمِ وَبِحَمْدِهِ", "img": "", "rumi": "Subhaana rabbiyal 'azhiimi wa bihamdih.", "maksud": "Maha Suci Tuhanku Yang Maha Agung dan segala pujian hanya untuk-Nya."}, {"id": "s4", "tajuk": "Doa Bangun Dari Rukuk", "step": "Iktidal", "arab_unicode": "سَمِعَ اللهُ لِمَنْ حَمِدَهُ، رَبَّنَا وَلَكَ الْحَمْدُ حَمْدًا كَثِيرًا طَيِّبًا مُبَارَكًا فِيهِ", "img": "", "rumi": "Sami'allaahu liman hamidah. Rabbanaa wa lakal hamdu hamdan katsiiran thayyiban mubaarakan fiih.", "maksud": "Allah mendengar orang yang memuji-Nya. Wahai Tuhan kami, dan bagi-Mu segala puji, pujian yang banyak, baik dan penuh berkat."}, {"id": "s5", "tajuk": "Doa Ketika Sujud", "step": "Sujud", "arab_unicode": "سُبْحَانَ رَبِّيَ الْأَعْلَى وَبِحَمْدِهِ", "img": "", "rumi": "Subhaana rabbiyal a'laa wa bihamdih.", "maksud": "Maha Suci Tuhanku Yang Maha Tinggi dan segala pujian hanya untuk-Nya."}, {"id": "s6", "tajuk": "Doa Duduk Antara Dua Sujud", "step": "Duduk", "arab_unicode": "رَبِّ اغْفِرْ لِي وَارْحَمْنِي وَاجْبُرْنِي وَارْفَعْنِي وَارْزُقْنِي وَاهْدِنِي وَعَافِنِي وَاعْفُ عَنِّي", "img": "", "rumi": "Rabbighfirlii warhamnii wajburnii warfa'nii warzuqnii wahdinii wa'aafinii wa'fu 'annii.", "maksud": "Ya Allah ampunilah aku, rahmatilah aku, perbaikilah keadaanku, tinggikanlah darjatku, berilah rezeki kepadaku, tunjukilah aku, sihatkanlah aku dan maafkanlah aku."}, {"id": "s7", "tajuk": "Doa Duduk Tahiyat Awal", "step": "Tahiyat Awal", "arab_unicode": "اَلتَّحِيَّاتُ الْمُبَارَكَاتُ الصَّلَوَاتُ الطَّيِّبَاتُ لِلَّهِ. اَلسَّلَامُ عَلَيْكَ أَيُّهَا النَّبِيُّ وَرَحْمَةُ اللهِ وَبَرَكَاتُهُ. اَلسَّلَامُ عَلَيْنَا وَعَلَى عِبَادِ اللهِ الصَّالِحِينَ. أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا اللهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا رَسُولُ اللهِ. اَللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ", "img": "", "rumi": "Attahiyyaatul mubaarokaatush sholawaatuth thoyyibaatu lillaah. Assalaamu 'alaika ayyuhan nabiyyu wa rohmatullahi wa barokaatuh. Assalaamu'alainaa wa 'alaa 'ibaadillaahish shoolihiin. Asyhadu allaa ilaaha illallah wa asyhadu anna Muhammadar rosuulullah. Allahumma sholli 'alaa Muhammad wa 'alaa aali Muhammad.", "maksud": "Segala penghormatan yang berkat dan mulia adalah untuk Allah. Sejahtera atas engkau wahai Nabi dan Rahmat Allah serta keberkatanNya. Sejahtera ke atas kami dan hamba-hamba Allah yang soleh. Aku naik saksi bahawa tiada tuhan melainkan Allah dan aku naik saksi bahawasanya Muhammad itu pesuruh Allah. Ya Allah, selawatkanlah ke atas Nabi Muhammad dan ke atas keluarga Muhammad."}, {"id": "s8", "tajuk": "Doa Duduk Tahiyat Akhir", "step": "Tahiyat Akhir", "arab_unicode": "اَلتَّحِيَّاتُ الْمُبَارَكَاتُ الصَّلَوَاتُ الطَّيِّبَاتُ لِلَّهِ. اَلسَّلَامُ عَلَيْكَ أَيُّهَا النَّبِيُّ وَرَحْمَةُ اللهِ وَبَرَكَاتُهُ. اَلسَّلَامُ عَلَيْنَا وَعَلَى عِبَادِ اللهِ الصَّالِحِينَ. أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا اللهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا رَسُولُ اللهِ. اَللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ. كَمَا صَلَّيْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ. وَبَارِكْ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ. كَمَا بَارَكْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ فِي الْعَالَمِينَ إِنَّكَ حَمِيدٌ مَجِيدٌ", "img": "", "rumi": "Attahiyyaatul mubaarakaatush shalawaatuth thayyibaatulillaah. Assalaamu'alaika ayyuhan nabiyyu warahmatullaahi wabarakatuh. Assalaamu'alainaa wa'alaa ibaadillaahish shaalihiin. Asyhadu allaa ilaaha illallaah, wa asyhadu anna muhammadar rasuulullaah. Allahumma salli 'alaa Muhammad wa'alaa aali Muhammad. Kamaa sallaita 'alaa Ibraahiima wa'alaa aali Ibraahiim. Wa baarik 'alaa Muhammad wa'alaa aali Muhammad. Kamaa baarokta 'alaa Ibraahiima wa'alaa aali Ibraahiim fil'aalamiina innaka hamiidum majiid.", "maksud": "Segala kehormatan, keberkatan, segala doa dan kebaikan untuk Allah. Keselamatan, rahmat Allah dan berkatNya tetap kepadamu ya Nabi. Keselamatan mudah-mudahan tetap kepada kami dan hamba-hamba Allah yang soleh. Aku mengaku tiada tuhan yang disembah melainkan Allah dan aku mengaku Nabi Muhammad SAW ialah pesuruh Allah. Ya Allah, berilah rahmat kepada Nabi Muhammad dan keluarga Muhammad. Sebagaimana Engkau merahmati Nabi Ibrahim dan keluarga Ibrahim. Berkatilah Nabi Muhammad dan keluarga Muhammad. Sebagaimana Engkau memberkati Nabi Ibrahim dan keluarga Ibrahim di alam semesta ini, sesungguhnya Engkau sahajalah Yang Paling Terpuji dan Yang Paling Mulia."}, {"id": "s9", "tajuk": "Doa Qunut", "step": "Subuh — Iktidal", "arab_unicode": "اَللَّهُمَّ اهْدِنِي فِيمَنْ هَدَيْتَ، وَعَافِنِي فِيمَنْ عَافَيْتَ، وَتَوَلَّنِي فِيمَنْ تَوَلَّيْتَ، وَبَارِكْ لِي فِيمَا أَعْطَيْتَ، وَقِنِي شَرَّ مَا قَضَيْتَ، فَإِنَّكَ تَقْضِي وَلَا يُقْضَى عَلَيْكَ، وَإِنَّهُ لَا يَذِلُّ مَنْ وَالَيْتَ، وَلَا يَعِزُّ مَنْ عَادَيْتَ، تَبَارَكْتَ رَبَّنَا وَتَعَالَيْتَ، فَلَكَ الْحَمْدُ عَلَى مَا قَضَيْتَ، أَسْتَغْفِرُكَ وَأَتُوبُ إِلَيْكَ، وَصَلَّى اللهُ عَلَى سَيِّدِنَا مُحَمَّدٍ النَّبِيِّ الْأُمِّيِّ وَعَلَى آلِهِ وَصَحْبِهِ وَسَلَّمَ", "img": "", "rumi": "Allahummahdinii fiiman hadayt, wa 'aafinii fiiman 'aafayt, wa tawallaniy fiiman tawallayt, wa baarik lii fiimaa a'thayt, wa qinii syarra maa qadhayt, fa innaka taqdhii wa laa yuqdha 'alayk, wa innahu laa yazillu man waalayt, wa laa ya'izzu man 'aadayt, tabaarakta rabbanaa wa ta'aalayt, falakal hamdu 'alaa maa qadhayt, astaghfiruka wa atuubu ilayk, wa sallallaahu 'alaa sayyidinaa muhammadinin nabiyyil ummiyyi wa 'alaa aalihi wa sahbihi wa sallam.", "maksud": "Ya Allah, tunjukilah aku bersama orang yang Engkau tunjuki, sihatkanlah aku bersama orang yang Engkau sihatkan, peliharalah aku bersama orang yang Engkau pelihara, berkatilah aku dalam apa yang Engkau berikan, jauhkanlah aku dari keburukan apa yang Engkau tetapkan. Sesungguhnya Engkau yang menetapkan dan tiada yang dapat menetapkan ke atas-Mu. Sesungguhnya tidak akan hina orang yang Engkau kasihi dan tidak akan mulia orang yang Engkau musuhi. Maha Berkat Engkau wahai Tuhan kami dan Maha Tinggi Engkau. Maka bagi-Mu segala pujian di atas apa yang Engkau tetapkan. Aku memohon ampun kepada-Mu dan aku bertaubat kepada-Mu. Dan semoga Allah melimpahkan selawat dan kesejahteraan ke atas junjungan kami Nabi Muhammad, nabi yang ummi, serta ke atas keluarga dan para sahabat baginda."},
+ {"id": "s10", "tajuk": "Doa Qunut Nazilah", "step": "Iktidal — Ketika Umat Islam Ditimpa Musibah", "arab_unicode": "اَللَّهُمَّ إِنَّا نَجْعَلُكَ فِي نُحُورِ أَعْدَائِنَا، وَنَعُوذُ بِكَ مِنْ شُرُورِهِمْ، اَللَّهُمَّ بَدِّدْ شَمْلَهُمْ وَفَرِّقْ جَمْعَهُمْ، وَشَتِّتْ كَلِمَتَهُمْ وَزَلْزِلْ أَقْدَامَهُمْ، وَسَلِّطْ عَلَيْهِمْ كَلْبًا مِنْ كِلَابِكَ، يَا قَهَّارُ يَا جَبَّارُ يَا مُنْتَقِمُ، يَا اللهُ يَا اللهُ يَا اللهُ، اَللَّهُمَّ يَا مُنْزِلَ الْكِتَابِ وَيَا مُجْرِيَ السَّحَابِ، وَيَا هَازِمَ الْأَحْزَابِ اِهْزِمْهُمْ وَانْصُرْنَا عَلَيْهِمْ", "img": "", "rumi": "Allahumma innaa naj'aluka fii nuhuuri a'daa'inaa, wa na'uuzu bika min syuruurihim. Allahumma baddid syamlahum wa farriq jam'ahum, wa syattit kalimatahum wa zalzil aqdaamahum, wa sallith 'alayhim kalban min kilaabik. Yaa Qahhaaru, Yaa Jabbaaru, Yaa Muntaqim. Yaa Allah, Yaa Allah, Yaa Allah. Allahumma yaa munzilal kitaab, wa yaa mujriyas sahaab, wa yaa haazimal ahzaab, ihzimhum wansurnaa 'alayhim.", "maksud": "Ya Allah, sesungguhnya kami meletakkan Engkau di batang leher musuh-musuh kami, dan kami berlindung dengan-Mu daripada kejahatan mereka. Ya Allah, hancurkanlah kumpulan mereka dan pecah-belahkanlah pakatan mereka, leburkanlah pendirian mereka dan goncangkanlah langkah-langkah mereka, serta cengkamkanlah ke atas mereka anjing-anjing-Mu. Wahai Tuhan Yang Maha Memaksa, wahai Tuhan Yang Maha Perkasa, wahai Tuhan Yang Maha Membalas. Ya Allah, Ya Allah, Ya Allah. Ya Allah, wahai Tuhan yang menurunkan kitab, yang menggerakkan awan, dan yang menewaskan tentera Ahzab — kalahkanlah mereka dan berikanlah kemenangan kepada kami ke atas mereka."}];
+const WIRID=[{"id": "w01", "num": "1", "tajuk": "Istighfar", "kali": "3x", "img": "", "rumi": "Astagfirullahal Azim, Allazi La Ilaha il'la Huwal Hayyul Qayyum, Wa Atubu ilaih", "maksud": "Aku memohon ampun kepada Allah Yang Maha Besar, tiada tuhan selain Dia, yang hidup lagi sentiasa berkuasa dan aku bertaubat kepadaNya.", "arab_unicode": "أَسْتَغْفِرُ اللهَ الْعَظِيمَ الَّذِي لَا إِلَهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ وَأَتُوبُ إِلَيْهِ"}, {"id": "w02", "num": "2", "tajuk": "Pengakuan Tauhid", "kali": "3x / 10x", "img": "", "rumi": "La ilaha il'lallahu Wahdahu La Syarika Lah, Lahul Mulku Wa Lahul Hamdu Yuhyi Wa Yumitu Wa Huwa Ala Kul'li Syai'in Qadir", "maksud": "Tiada tuhan yang disembah dengan sebenarnya melainkan Allah, tiada sekutu bagiNya, bagi Allah seluruh kekuasaan dan untuk Allah segala kepujian. Dia menghidupkan dan mematikan, Dialah amat berkuasa atas segala sesuatu.", "arab_unicode": "لَا إِلَهَ إِلَّا اللهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ يُحْيِي وَيُمِيتُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ"}, {"id": "w03", "num": "3", "tajuk": "Zikir Memohon Dijauhkan daripada Azab Neraka", "kali": "3x (Subuh &amp; Maghrib: 7x)", "img": "", "rumi": "Allahum'ma Ajirina Minan Nar", "maksud": "Ya Allah jauhkan aku daripada azab api neraka.<br><br><em>Nota: Ganti 'Ajirna' dengan 'AjirNi' jika solat sendirian. Baca 7x untuk Solat Subuh dan Maghrib.</em>", "arab_unicode": "اللَّهُمَّ أَجِرْنَا مِنَ النَّارِ"}, {"id": "w04", "num": "4", "tajuk": "Zikir Memohon Keselamatan", "kali": "1x", "img": "", "rumi": "Allahum'ma Antas Salam, Wa Minkas Salam, Wa ilai ka Yaudus Salam, Fahay yi'na Rabbana Bis Salam, Wa Adkhil nal Jannatada Ras Salam, Tabarakta Rabbana Wa Ta'alayta Ya Zal Jalali Wal Ikram", "maksud": "Ya Allah Engkaulah penyelamat sejahtera, daripada Engkaulah datangnya kesejahteraan, kepada Engkaulah kembalinya kesejahteraan itu, hidupkanlah kami dengan selamat sejahtera dan masukkan kami ke syurga negara yang aman sejahtera, bertambah-tambah berkatMu Ya Allah Tuhan kami dan Maha Tinggi, ya Allah yang empunya segala kebesaran dan kemuliaan.", "arab_unicode": "اللَّهُمَّ أَنْتَ السَّلَامُ، وَمِنْكَ السَّلَامُ، وَإِلَيْكَ يَعُودُ السَّلَامُ، فَحَيِّنَا رَبَّنَا بِالسَّلَامِ، وَأَدْخِلْنَا الْجَنَّةَ دَارَ السَّلَامِ، تَبَارَكْتَ رَبَّنَا وَتَعَالَيْتَ يَا ذَا الْجَلَالِ وَالْإِكْرَامِ"}, {"id": "w05", "num": "5", "tajuk": "Ta'awwuz", "kali": "1x", "img": "", "rumi": "Au Zu Billahi Minasy Syaitanir Rajim", "maksud": "Aku berlindung dengan Allah daripada syaitan yang direjam.", "arab_unicode": "أَعُوذُ بِاللهِ مِنَ الشَّيْطَانِ الرَّجِيمِ"}, {"id": "w06", "num": "6", "tajuk": "Surah Al-Fatihah", "kali": "1x", "img": "./quran-img/Al-Fatihah.jpg", "rumi": "Bismillahir Rahmanir Rahim. Alhamdul lillahi Rabbil Alamin. Ar Rahmanir Rahim. Maliki Yawmid Din. Iyyaka Na'budu Wa Iyyaka Nasta'in. Ihdinas Siratal Mustaqim. Siratal Lazina An'amta Alayhim Ghayril Maghdubi Alayhim Wa Lad Dallin.", "maksud": "Dengan nama Allah Yang Maha Pemurah lagi Maha Mengasihani. Segala puji tertentu bagi Allah, Tuhan yang memelihara dan mentadbirkan sekalian alam. Yang Maha Pemurah lagi Maha Mengasihani. Yang Menguasai pemerintahan hari Pembalasan. Engkaulah sahaja Yang Kami sembah, dan kepada Engkaulah sahaja kami memohon pertolongan. Tunjukilah kami jalan yang lurus. Iaitu jalan orang-orang yang Engkau telah kurniakan nikmat kepada mereka, bukan jalan orang-orang yang Engkau telah murkai, dan bukan pula jalan orang-orang yang sesat.", "arab_unicode": ""}, {"id": "w06b", "num": "7", "tajuk": "Surah Al-Baqarah Ayat 163", "kali": "1x", "img": "./quran-img/Al-Baqarah 163.jpg", "rumi": "Wa ilahukum ilahun wahid, la ilaha illa huwar Rahmanir Rahim", "maksud": "Dan Tuhan kamu ialah Tuhan Yang Maha Esa; tiada Tuhan (yang berhak disembah) melainkan Dia, Yang Maha Pemurah, lagi Maha Mengasihani.", "arab_unicode": ""}, {"id": "w07", "num": "8", "tajuk": "Ayatul Kursi", "kali": "1x", "img": "./quran-img/Ayat Kursi.jpg", "rumi": "Allahu La Ilaha Illa Huwal Hayyul Qayyum, La Takhuzuhu Sinatun Wa La Naum, Lahu Ma Fis Samawati Wa Ma Fil Ard, Man Zallazi Yasyfau Indahu Illa Bi Iznih, Yak' lamu Ma Baina Aidihim Wa Ma Khalfahum, Wa La Yuhituna Bisyaim Min Ilmihi Illa Bima Syaa, Wasiа Kursiyyuhus Samawati Wal Ard, Wa La Yauduhu Hifzuhuma, Wa Huwal Aliyyul Azim.", "maksud": "Allah, tiada Tuhan melainkan Dia, Yang Tetap hidup, Yang Kekal selama-lamanya mentadbirkan sekalian makhlukNya. Yang tidak mengantuk usahkan tidur. Yang memiliki segala yang ada di langit dan di bumi. Tiada sesiapa yang dapat memberi syafaat di sisiNya melainkan dengan izinNya. Yang mengetahui apa yang ada di hadapan dan di belakang mereka. Luasnya Kursi Allah meliputi langit dan bumi, dan tiadalah menjadi keberatan kepada Allah menjaga serta memelihara keduanya. Dan Dia lah Yang Maha Tinggi lagi Maha Besar.", "arab_unicode": ""}, {"id": "w08", "num": "9", "tajuk": "Surah Al-Ikhlas", "kali": "1x", "img": "./quran-img/Al-Ikhlas.jpg", "rumi": "Bismillahir Rahmanir Rahim. Qul Huwallahu Ahad. Allahus Samad. Lam Yalid Wa Lam Yulad. Wa Lam Yakul Lahu Kufuwan Ahad.", "maksud": "Katakanlah: Tuhanku ialah Allah Yang Maha Esa. Allah Yang menjadi tumpuan sekalian makhluk untuk memohon sebarang hajat. Ia tiada beranak, dan Ia pula tidak diperanakkan. Dan tidak ada sesiapapun yang serupa denganNya.", "arab_unicode": ""}, {"id": "w09", "num": "10", "tajuk": "Surah Al-Falaq", "kali": "1x", "img": "./quran-img/Al-Falaq.jpg", "rumi": "Bismillahir Rahmanir Rahim. Qul Auzu Birabbil Falaq. Min Syarri Ma Khalaq. Wa Min Syarri Ghasiqin Iza Waqab. Wa Min Syarrin Naffasati Fil Uqad. Wa Min Syarri Hasidin Iza Hasad.", "maksud": "Katakanlah: Aku berlindung kepada Tuhan yang menciptakan sekalian makhluk, dari bencana makhluk-makhluk yang Ia ciptakan, dan dari bahaya gelap apabila ia masuk, dan dari kejahatan makhluk-makhluk yang menghembus-hembus pada simpulan-simpulan, dan dari kejahatan orang yang dengki apabila ia melakukan dengkinya.", "arab_unicode": ""}, {"id": "w10", "num": "11", "tajuk": "Surah An-Nas", "kali": "1x", "img": "./quran-img/An-Naas.jpg", "rumi": "Bismillahir Rahmanir Rahim. Qul Auzu Birabbin Nas. Malikin Nas. Ilahin Nas. Min Syarril Waswasil Khannas. Allazi Yuwaswisu Fi Sudurin Nas. Minal Jinnati Wan Nas.", "maksud": "Katakanlah: Aku berlindung kepada Pemulihara sekalian manusia, Yang Menguasai sekalian manusia, Tuhan yang berhak disembah oleh sekalian manusia, dari kejahatan pembisik penghasut yang timbul tenggelam, yang melemparkan bisikan dan hasutannya ke dalam hati manusia, dari kalangan jin dan manusia.", "arab_unicode": ""}, {"id": "w11", "num": "12", "tajuk": "Pembuka Tasbih", "kali": "1x", "img": "", "rumi": "Ilahi Ya Rabbi — Subhanallah<br><em>(Jika imam: Ilahana Ya Rabbana — Subhanallah)</em>", "maksud": "Ya Allah Ya Tuhanku — Maha Suci Allah.<br><em>(Jika imam: Ya Allah Ya Tuhan Kami — Maha Suci Allah)</em>", "arab_unicode": "إِلَٰهِي رَبِّي سُبْحَانَ اللهِ"}, {"id": "w12", "num": "13", "tajuk": "Tasbih (33 Kali)", "kali": "33x", "img": "", "rumi": "Subhanallah", "maksud": "Maha Suci Allah.", "arab_unicode": "سُبْحَانَ اللهِ"}, {"id": "w13", "num": "14", "tajuk": "Pembuka Tahmid", "kali": "1x", "img": "", "rumi": "Subhanallahi Wa Bi Hamdihi Daiman Qaiman Abada — Alhamdu Lillah", "maksud": "Maha Suci Allah, aku bertasbih sambil memuji-muji kekal sentiasa selama-lamanya — segala pujian hanya bagi Allah.", "arab_unicode": "سُبْحَانَ اللهِ وَبِحَمْدِهِ دَائِمًا قَائِمًا أَبَدًا"}, {"id": "w14", "num": "15", "tajuk": "Tahmid (33 Kali)", "kali": "33x", "img": "", "rumi": "Alhamdulillah", "maksud": "Segala pujian hanya bagi Allah.", "arab_unicode": "اَلْحَمْدُ لِلَّهِ"}, {"id": "w15", "num": "16", "tajuk": "Pembuka Takbir", "kali": "1x", "img": "", "rumi": "Al Hamdu Lillahi Rabbil Alamina Ala Kulli Halin Wa Nikmah — Allahu Akbar", "maksud": "Segala puji tertentu bagi Allah, Tuhan yang Memelihara dan Mentadbirkan sekalian alam ke atas setiap keadaan dan dalam setiap nikmat.", "arab_unicode": "اَلْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ عَلَى كُلِّ حَالٍ وَفِي كُلِّ حَالٍ وَنِعْمَةٍ"}, {"id": "w16", "num": "17", "tajuk": "Takbir (33 Kali)", "kali": "33x", "img": "", "rumi": "Allahu Akbar", "maksud": "Allah Maha Besar.", "arab_unicode": "اَللهُ أَكْبَرُ"}, {"id": "w17", "num": "18", "tajuk": "Pelengkap Tasbih, Tahmid dan Takbir", "kali": "1x", "img": "", "rumi": "Allahu Akbar Kabira Wa Hamdu Lillahi Kathira Wa Subhanallahi Bukrataw Wa Ashila. La Ilaha Illa Allahu Wahdahu La Syarika Lah, Lahul Mulku Wa Lahul Hamdu Yuhyi Wa Yumitu Wa Huwa Ala Kulli Syaiin Qadir,  Wa Ilai hil Masir. Wa La Hawla Wa La Quwwata Illa Billahil Aliyyil Azim, Astagfirullahal Azim.", "maksud": "Allah Maha Besar, segala puji bagi Allah, Maha Suci Allah pagi dan petang. Tiada Tuhan yang disembah melainkan Allah Yang Maha Esa, tidak ada bersekutu denganNya sesuatu. BagiNya kerajaan, bagiNya segala pujian. Dialah yang menghidupkan dan mematikan. Dialah Yang Maha Kuasa ke atas segala sesuatu dan kepada Allah jualah tempat kembali. Dan tidak ada daya dan tidak ada kekuatan, kecuali dengan pertolongan Allah Yang Maha Tinggi dan Maha Agung. Aku mohon keampunan daripada Allah.", "arab_unicode": "اَللهُ أَكْبَرُ كَبِيرًا وَالْحَمْدُ لِلَّهِ كَثِيرًا وَسُبْحَانَ اللهِ بُكْرَةً وَأَصِيلًا، لَا إِلَهَ إِلَّا اللهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ يُحْيِي وَيُمِيتُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ وَإِلَيْهِ الْمَصِيرُ، وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللهِ الْعَلِيِّ الْعَظِيمِ، أَسْتَغْفِرُ اللهَ الْعَظِيمَ"}, {"id": "w18", "num": "19", "tajuk": "Doa Penutup Wirid (1/8 – Ta'awwuz, Bismillah dan Puji-pujian kepada Allah dalam doa)", "kali": "1x", "img": "", "rumi": "Auzu Billahi Minasy Syaitanir Rajim. Bismillahir Rahmanir Rahim. Alhamdu Lillahi Rabbil Alamin. Hamdan Yuwafi Niamahu Wa Yukafiru Mazidah.", "maksud": "Aku berlindung kepada Allah dari godaan syaitan yang terkutuk. Dengan nama Allah Yang Maha Pemurah lagi Maha Penyayang. Segala puji bagi Allah Tuhan seluruh alam, dengan pujian yang sesuai dengan nikmat-nikmatNya dan memadai dengan penambahanNya.", "arab_unicode": "أَعُوذُ بِاللهِ مِنَ الشَّيْطَانِ الرَّجِيمِ، بِسْمِ اللهِ الرَّحْمَنِ الرَّحِيمِ، اَلْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ، حَمْدًا يُوَافِي نِعَمَهُ وَيُكَافِئُ مَزِيدَهُ"}, {"id": "w19", "num": "19", "tajuk": "Doa Penutup Wirid (2/8 – Tahmid dalam doa)", "kali": "1x", "img": "", "rumi": "Ya Rabbana Lakal Hamdu Kama Yanbaghi Li Jalali Wajhikal Karim Wa Azimi Sultanik", "maksud": "Wahai Tuhan kami, hanya bagi-Mu segala puji, sebagaimana pujian itu patut terhadap keagungan dan kemuliaan-Mu serta keluhuran kerajaan-Mu.", "arab_unicode": "يَا رَبَّنَا لَكَ الْحَمْدُ كَمَا يَنْبَغِي لِجَلَالِ وَجْهِكَ الْكَرِيمِ وَعَظِيمِ سُلْطَانِكَ"}, {"id": "w35", "num": "19", "tajuk": "Doa Penutup Wirid (3/8 – Selawat Ibrahimiyyah)", "kali": "1x", "img": "", "rumi": "Allahumma Salli 'Ala Muhammadin Wa 'Ala Ali Muhammadin, Kama Sallaita 'Ala Ibrahima Wa 'Ala Ali Ibrahima, Wa Barik 'Ala Muhammadin Wa 'Ala Ali Muhammadin, Kama Barakta 'Ala Ibrahima Wa 'Ala Ali Ibrahima, Fil 'Alamina Innaka Hamidun Majid.", "maksud": "Ya Allah! Berilah selawat kepada Muhammad dan keluarga Muhammad, sebagaimana Engkau telah memberi selawat kepada Ibrahim dan keluarga Ibrahim, dan berilah berkat kepada Muhammad dan keluarga Muhammad, sebagaimana Engkau memberi berkat kepada Ibrahim dan keluarga Ibrahim. Di dalam alam semesta ini, sesungguhnya Engkau Maha Terpuji lagi Maha Mulia.", "arab_unicode": "اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ، كَمَا صَلَّيْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ، وَبَارِكْ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ، كَمَا بَارَكْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ، فِي الْعَالَمِينَ إِنَّكَ حَمِيدٌ مَجِيدٌ"}, {"id": "w20", "num": "19", "tajuk": "Doa Penutup Wirid (4/8 – Doa untuk Ibu Bapa)", "kali": "1x", "img": "", "arab_unicode": "اَللَّهُمَّ اغْفِرْ لِي وَلِوَالِدَيَّ وَارْحَمْهُمَا كَمَا رَبَّيَانِي صَغِيرًا", "rumi": "Allahummagh firli zunubi wa li wa lidayya warhamhuma kama rabbayani soghiro.", "maksud": "Ya Allah! Ampunilah dosa kami dan dosa kedua orang tua kami dan kasihilah mereka sebagaimana mereka mengasihi kami sejak kecil."}, {"id": "w36", "num": "19", "tajuk": "Doa Penutup Wirid (5/8 – Doa untuk Guru)", "kali": "1x", "img": "", "rumi": "Allahummaghfir Li Masyayikhina Wa Liman 'Allamana, Warhamhum Wa Akrimhum Biridhwanikal 'Azim, Fi Maq'adis Sidqi 'Indaka Ya Arhamar Rahimin.", "maksud": "Wahai Allah, ampunilah guru-guru kami dan orang yang telah mengajar kami. Sayangilah mereka dan muliakanlah mereka dengan keredaan-Mu yang agung, di tempat yang disenangi di sisi-Mu, wahai Yang Maha Penyayang di antara para penyayang.", "arab_unicode": "اللَّهُمَّ اغْفِرْ لِمَشَايِخِنَا وَلِمَنْ عَلَّمَنَا، وَارْحَمْهُمْ وَأَكْرِمْهُمْ بِرِضْوَانِكَ الْعَظِيمِ، فِي مَقْعَدِ الصِّدْقِ عِنْدَكَ يَا أَرْحَمَ الرَّاحِمِينَ"}, {"id": "w21", "num": "19", "tajuk": "Doa Penutup Wirid (6/8 – Doa Selamat Dunia dan Akhirat)", "kali": "1x", "img": "", "rumi": "Allahumma Inna Nasaluka Salamatan Fid Din, Wa Afiyatan Fil Jasad, Wa Ziyadatan Fil ilm, Wa Barakatan Fir Rizq, Wa Taubatan Qablal Mawt, Wa Rahmatan Indal Mawt, Wa Maghfiratan Badal Mawt. Allahumma Hawwin Alayna Fi Sakaratil Mawt, Wan Najata Minan Nar, Wal Afwa Indal Hisab.", "maksud": "Ya Allah, permohonan kami kepada-Mu semoga kami mendapat keselamatan agama, kesihatan jasmani, bertambahnya ilmu, keberkatan dalam rezeki, taubat sebelum mati, mendapatkan rahmat ketika mati, dan memperoleh keampunan setelah mati. Ya Allah, mudahkanlah sakaratul maut kami, bebaskanlah kami dari azab neraka, dan memperoleh keampunan ketika dihisab.", "arab_unicode": "اَللَّهُمَّ إِنَّا نَسْأَلُكَ سَلَامَةً فِي الدِّينِ، وَعَافِيَةً فِي الْجَسَدِ، وَزِيَادَةً فِي الْعِلْمِ، وَبَرَكَةً فِي الرِّزْقِ، وَتَوْبَةً قَبْلَ الْمَوْتِ، وَرَحْمَةً عِنْدَ الْمَوْتِ، وَمَغْفِرَةً بَعْدَ الْمَوْتِ، اَللَّهُمَّ هَوِّنْ عَلَيْنَا فِي سَكَرَاتِ الْمَوْتِ، وَالنَّجَاةَ مِنَ النَّارِ، وَالْعَفْوَ عِنْدَ الْحِسَابِ"}, {"id": "w22", "num": "19", "tajuk": "Doa Penutup Wirid (7/8 – Doa Zikir, Syukur dan Ibadah yang Baik)", "kali": "1x", "img": "", "rumi": "Allahumma Ainna Ala Zikrika Wa Syukrika Wa Husni Ibadatik.", "maksud": "Ya Allah, tolonglah kami untuk selalu mengingat-Mu dan mensyukuri rahmat dan nikmat-Mu, dan perbaikilah amal ibadah kami kepada-Mu.", "arab_unicode": "اَللَّهُمَّ أَعِنَّا عَلَى ذِكْرِكَ وَشُكْرِكَ وَحُسْنِ عِبَادَتِكَ"}, {"id": "w37", "num": "19", "tajuk": "Doa Penutup Wirid (8/8 – Doa untuk Semua Muslimin dan Muslimat)", "kali": "1x", "img": "", "rumi": "Allahummaghfir Lil Muslimina Wal Muslimat, Wal Mu'minina Wal Mu'minat, Al-Ahya'i Minhum Wal Amwat.", "maksud": "Ya Allah, ampunilah dosa orang-orang Islam lelaki dan perempuan, orang-orang beriman lelaki dan perempuan, sama ada yang masih hidup mahupun yang telah meninggal dunia.", "arab_unicode": "اللَّهُمَّ اغْفِرْ لِلْمُسْلِمِينَ وَالْمُسْلِمَاتِ، وَالْمُؤْمِنِينَ وَالْمُؤْمِنَاتِ، الْأَحْيَاءِ مِنْهُمْ وَالْأَمْوَاتِ"}, {"id": "w23", "num": "19", "tajuk": "Doa Rabbana (1/6 – Memohon Keampunan dan Rahmat Allah)", "kali": "1x", "img": "", "rumi": "Rabbanaa zhalamnaa anfusanaa wa in lam taghfir lanaa wa tarhamnaa lanakuunanna minal khaasiriin.", "maksud": "Ya Tuhan kami, kami telah menzalimi diri kami sendiri. Jika Engkau tidak mengampuni kami dan memberi rahmat kepada kami, nescaya kami termasuk orang-orang yang rugi.", "arab_unicode": "رَبَّنَا ظَلَمْنَا أَنْفُسَنَا وَإِنْ لَمْ تَغْفِرْ لَنَا وَتَرْحَمْنَا لَنَكُونَنَّ مِنَ الْخَاسِرِينَ"}, {"id": "w24", "num": "19", "tajuk": "Doa Rabbana (2/6 – Memohon Keteguhan Hati di Atas Hidayah)", "kali": "1x", "img": "", "rumi": "Rabbanaa laa tuzigh quluubanaa ba'da idz hadaytanaa wa hab lanaa min ladunka rahmatan innaka antal wahhaab.", "maksud": "Ya Tuhan kami, janganlah Engkau condongkan hati kami kepada kesesatan setelah Engkau berikan petunjuk kepada kami, dan kurniakanlah kepada kami rahmat dari sisi-Mu, sesungguhnya Engkau Maha Pemberi.", "arab_unicode": "رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِنْ لَدُنْكَ رَحْمَةً إِنَّكَ أَنْتَ الْوَهَّابُ"}, {"id": "w25", "num": "19", "tajuk": "Doa Rabbana (3/6 – Memohon Keampunan atas Kelalaian dan Kesilapan)", "kali": "1x", "img": "", "rumi": "Rabbanaa laa tu'aakhidznaa in nasiinaa aw akhtha'naa.", "maksud": "Ya Tuhan kami, janganlah Engkau hukum kami jika kami lupa atau kami melakukan kesalahan.", "arab_unicode": "رَبَّنَا لَا تُؤَاخِذْنَا إِنْ نَسِينَا أَوْ أَخْطَأْنَا"}, {"id": "w26", "num": "19", "tajuk": "Doa Rabbana (4/6 – Memohon Keringanan Beban, Keampunan dan Pertolongan Allah)", "kali": "1x", "img": "", "rumi": "Rabbanaa wa laa tuhammilnaa maa laa thaaqata lanaa bih, wa'fu 'annaa waghfir lanaa warhamnaa, anta mawlaanaa fanshurnaa 'alal qawmil kaafiriin.", "maksud": "Ya Tuhan kami, janganlah Engkau pikulkan kepada kami apa yang tidak sanggup kami memikulnya. Maafkanlah kami, ampunilah kami, dan rahmatilah kami. Engkaulah pelindung kami, maka tolonglah kami menghadapi orang-orang kafir.", "arab_unicode": "رَبَّنَا وَلَا تُحَمِّلْنَا مَا لَا طَاقَةَ لَنَا بِهِ وَاعْفُ عَنَّا وَاغْفِرْ لَنَا وَارْحَمْنَا أَنْتَ مَوْلَانَا فَانْصُرْنَا عَلَى الْقَوْمِ الْكَافِرِينَ"}, {"id": "w27", "num": "19", "tajuk": "Doa Rabbana (5/6 – Memohon Keluarga yang Soleh dan Penyejuk Hati)", "kali": "1x", "img": "", "rumi": "Rabbanaa hab lanaa min azwaajinaa wa dzurriyyaatinaa qurrata a'yun waj'alnaa lil muttaqiina imaamaa.", "maksud": "Ya Tuhan kami, anugerahkanlah kepada kami pasangan kami dan keturunan kami sebagai penyenang hati kami, dan jadikanlah kami pemimpin bagi orang-orang yang bertakwa.", "arab_unicode": "رَبَّنَا هَبْ لَنَا مِنْ أَزْوَاجِنَا وَذُرِّيَّاتِنَا قُرَّةَ أَعْيُنٍ وَاجْعَلْنَا لِلْمُتَّقِينَ إِمَامًا"}, {"id": "w28", "num": "19", "tajuk": "Doa Rabbana (6/6 – Sapu Jagat)", "kali": "1x", "img": "", "rumi": "Rabbanaa aatinaa fid dunyaa hasanatan wa fil aakhirati hasanatan wa qinaa 'adzaaban naar.", "maksud": "Ya Tuhan kami, berilah kami kebahagiaan di dunia dan kebaikan di akhirat, dan lindungilah kami dari azab neraka.", "arab_unicode": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ"}, {"id": "w29", "num": "19", "tajuk": "Selawat Penutup Doa", "kali": "1x", "img": "", "arab_unicode": "وَصَلَّى اللهُ عَلَى خَيْرِ خَلْقِهِ سَيِّدِنَا مُحَمَّدٍ وَعَلَى آلِهِ وَصَحْبِهِ وَسَلَّمَ", "rumi": "Wa Sallallahu 'Ala Khayri Khalqihi Sayyidina Muhammadiw Wa 'Ala Alihi Wa Sahbihi Wa Sallam.", "maksud": "Dan semoga Allah melimpahkan selawat ke atas sebaik-baik makhluk-Nya, junjungan kami Nabi Muhammad SAW, serta ke atas keluarga dan para sahabat baginda, dan limpahkanlah kesejahteraan."}, {"id": "w30", "num": "19", "tajuk": "Doa Penutup Wirid (Tasbih Penutup Doa)", "kali": "1x", "img": "", "rumi": "Subhana Rabbika Rabbil Izzati Amma Yasifun. Wa Salamun Alal Mursalin. Wal Hamdu Lillahi Rabbil Alamin.", "maksud": "Mahasuci Tuhan-Mu, Tuhan Yang Maha Perkasa, dari sifat yang mereka katakan. Dan selamat sejahtera bagi para rasul dan segala puji bagi Allah Tuhan seluruh alam.", "arab_unicode": "سُبْحَانَ رَبِّكَ رَبِّ الْعِزَّةِ عَمَّا يَصِفُونَ وَسَلَامٌ عَلَى الْمُرْسَلِينَ وَالْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ"}, {"id": "wdiv1", "tajuk": "Amalan Tambahan Selepas Wirid (Pilihan)", "divider": true}, {"id": "w31", "num": "20", "tajuk": "Selawat Rezeki", "kali": "Baca sendiri", "img": "", "rumi": "", "maksud": "", "reminder": true}, {"id": "w32", "num": "21", "tajuk": "Selawat Nuril Anwar", "kali": "1x", "img": "", "rumi": "Allahumma Salli Wa Sallim 'Ala Nuril Anwar, Wa Sirril Asrar, Wa tiryagil aghyar, wa miftahiba bil yasar, Sayyidina Wa Maulana Muhammadinil mukhtar, Wa Alihi Atho-har, Wa Ash-habil akhyar, 'adada ni'amillahi wa Ifdalih.", "maksud": "Ya Allah, limpahkanlah selawat dan salam ke atas cahaya segala cahaya, rahsia segala rahsia, kunci pintu kemudahan, junjungan dan penghulu kami Muhammad Al-Mukhtar, beserta keluarganya yang suci dan sahabat-sahabatnya yang mulia, sebanyak bilangan nikmat Allah dan kurnia-Nya.", "arab_unicode": "اَللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نُورِ الْأَنْوَارِ وَسِرِّ الْأَسْرَارِ وَتِرْيَاقِ الْأَغْيَارِ وَمِفْتَاحِ بَابِ الْيَسَارِ سَيِّدِنَا وَمَوْلَانَا مُحَمَّدٍ الْمُخْتَارِ وَآلِهِ الْأَطْهَارِ وَأَصْحَابِهِ الْأَخْيَارِ عَدَدَ نِعَمِ اللهِ وَإِفْضَالِهِ"}, {"id": "w33", "num": "22", "tajuk": "Selawat Shifa", "kali": "1x", "img": "", "rumi": "Allahumma Salli 'Ala Sayyidina Muhammadin, Tib'bil Quluubi Wa Dawaa'iha, Wa 'Afiyatil Abdaa ni Wa Shifaa'iha, Wa Nuril Absaa ri Wa Dhiyaa'iha, Wa 'Ala Aalihi Wa Sahbihi Wa Sallim.", "maksud": "Ya Allah, limpahkanlah selawat ke atas junjungan kami Muhammad, penawar hati dan ubatnya, kesihatan badan dan penyembuhannya, cahaya penglihatan dan sinarnya, serta ke atas keluarga dan sahabat-sahabatnya, dan limpahkanlah salam.", "arab_unicode": "اَللَّهُمَّ صَلِّ عَلَى سَيِّدِنَا مُحَمَّدٍ طِبِّ الْقُلُوبِ وَدَوَائِهَا وَعَافِيَةِ الْأَبْدَانِ وَشِفَائِهَا وَنُورِ الْأَبْصَارِ وَضِيَائِهَا وَعَلَى آلِهِ وَصَحْبِهِ وَسَلِّمْ"}, {"id": "w34", "num": "23", "tajuk": "Surah Al-Maidah Ayat 114", "kali": "1x", "img": "./quran-img/Al-Maidah 114.jpg", "arab_unicode": "", "rumi": "Qaala 'iisabnu Maryama Allaahumma Rabbanaa Anzil 'Alaynaa Maa'idatam Minas Samaa'i Takuunu Lanaa 'iidal Li'awwalinaa Wa Aakhirinaa Wa Aayatam Minkh, Warzuqnaa Wa Anta Khairur Raaziqiin.", "maksud": "Berkata Isa putera Maryam: Ya Allah, Tuhan kami, turunkanlah kepada kami hidangan dari langit yang hari turunnya itu akan menjadi hari raya bagi kami, iaitu bagi orang-orang yang bersama kami dan yang datang sesudah kami, dan menjadi tanda bagi kekuasaan Engkau; berilah kami rezeki, dan Engkaulah Pemberi rezeki yang paling utama."}];
+const HARIAN=[{"id": "dh01", "tajuk": "Doa Bangun Tidur", "arab": "اَلْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ", "rumi": "Alhamdulillahil ladzii ahyaanaa ba'da maa amaatanaa wa ilaihin nushuur.", "maksud": "Segala puji bagi Allah yang telah mengembalikan kehidupan kepada kami setelah mematikan kami, dan kepada-Nya kami kembali."}, {"id": "dh02", "tajuk": "Doa Sebelum Tidur", "arab": "بِسْمِكَ اللَّهُمَّ أَحْيَا وَبِسْمِكَ أَمُوتُ", "rumi": "Bismika Allahumma ahyaa wa bismika amuut.", "maksud": "Dengan nama-Mu Ya Allah aku hidup dan dengan nama-Mu aku mati."}, {"id": "dh03", "tajuk": "Doa Memakai Pakaian", "arab": "اَللَّهُمَّ إِنِّي أَسْأَلُكَ مِنْ خَيْرِهِ وَخَيْرِ مَا هُوَ لَهُ، وَأَعُوذُ بِكَ مِنْ شَرِّهِ وَشَرِّ مَا هُوَ لَهُ", "rumi": "Allaahumma innii as'aluka min khairihi wa khaira maa huwa lahu, wa a'uudzubika min syarrihi wa syarri maa huwa lahu.", "maksud": "Ya Allah, sungguh aku memohon kepada-Mu kebaikan pakaian ini dan kebaikan sesuatu yang di dalamnya, dan aku berlindung kepada-Mu dari keburukan pakaian ini dan keburukan sesuatu yang ada di dalamnya."}, {"id": "dh04", "tajuk": "Doa Memakai Pakaian Baharu", "arab": "اَللَّهُمَّ لَكَ الْحَمْدُ أَنْتَ كَسَوْتَنِيهِ أَسْأَلُكَ مِنْ خَيْرِهِ وَخَيْرِ مَا صُنِعَ لَهُ وَأَعُوذُ بِكَ مِنْ شَرِّهِ وَشَرِّ مَا صُنِعَ لَهُ", "rumi": "Allahumma lakal hamdu anta kasautaniihi as'aluka min khairihi wa khairi maa suni'a lahu wa a'uudzubika min syarrihi wa syarri maa suni'a lahu.", "maksud": "Ya Allah, bagi-Mu segala puji. Engkau yang telah memakaikan pakaian itu kepadaku. Aku meminta kepada-Mu kebaikannya dan kebaikan apa saja yang ia dibuat untuknya. Dan aku berlindung kepada-Mu dari keburukannya dan keburukan apa saja yang ia dibuat untuknya."}, {"id": "dh05", "tajuk": "Doa Melepas Pakaian", "arab": "بِسْمِ اللهِ الَّذِي لَا إِلَهَ إِلَّا هُوَ", "rumi": "Bismillahil ladzii laa ilaaha illaa huwa.", "maksud": "Dengan nama Allah yang tiada tuhan selain Dia."}, {"id": "dh06", "tajuk": "Doa Masuk Tandas", "arab": "بِسْمِ اللهِ اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْخُبُثِ وَالْخَبَائِثِ", "rumi": "Bismillahi Allaahumma innii a'uudzu bika minal khubutsi wal khabaa'itsi.", "maksud": "Dengan nama Allah. Ya Allah, aku berlindung kepada-Mu dari godaan iblis jantan dan betina."}, {"id": "dh07", "tajuk": "Doa Keluar Tandas", "arab": "غُفْرَانَكَ", "rumi": "Ghufraanaka.", "maksud": "Aku memohon keampunan-Mu."}, {"id": "dh08", "tajuk": "Doa Sebelum Wuduk", "arab": "بِسْمِ اللهِ", "rumi": "Bismillah.", "maksud": "Dengan menyebut nama Allah."}, {"id": "dh09", "tajuk": "Doa Setelah Wuduk", "arab": "أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا اللهُ وَحْدَهُ لَا شَرِيكَ لَهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ، اَللَّهُمَّ اجْعَلْنِي مِنَ التَّوَّابِينَ وَاجْعَلْنِي مِنَ الْمُتَطَهِّرِينَ", "rumi": "Asyhadu an laa ilaaha illallaahu wahdahu laa syariika lahu wa asyhadu anna Muhammadan 'abduhu wa rasuuluhu. Allahummaj'alnii minat tawwaabiina waj'alnii minal mutathohhhiriina.", "maksud": "Aku bersaksi bahawa tidak ada Tuhan yang patut disembah selain Allah dan tiada sekutu bagi-Nya. Aku juga bersaksi bahawa Muhammad adalah hamba dan rasul-Nya. Ya Allah, jadikanlah aku termasuk golongan orang-orang yang bertaubat dan jadikan pula aku termasuk golongan orang-orang yang menyucikan diri."}, {"id": "dh10", "tajuk": "Doa Masuk Masjid", "arab": "اَللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ", "rumi": "Allahummaf tah lii abwaaba rahmatika.", "maksud": "Ya Allah, bukalah pintu-pintu rahmat-Mu untukku."}, {"id": "dh11", "tajuk": "Doa Keluar Masjid", "arab": "اَللَّهُمَّ إِنِّي أَسْأَلُكَ مِنْ فَضْلِكَ", "rumi": "Allahumma innii as'aluka min fadhlika.", "maksud": "Ya Allah, sesungguhnya aku memohon kurnia kepada-Mu."}, {"id": "dh12", "tajuk": "Doa Setelah Iqamat", "arab": "أَقَامَهَا اللهُ وَأَدَامَهَا مَا دَامَتِ السَّمَوَاتُ وَالْأَرْضُ", "rumi": "Aqaamahallaahu wa adaamahaa maa daamatis samaawaatu wal ardhu.", "maksud": "Semoga Allah menegakkan dan mengekalkan solat selama masih ada langit dan bumi."}, {"id": "dh13", "tajuk": "Doa Sebelum Makan", "arab": "بِسْمِ اللهِ", "rumi": "Bismillah.", "maksud": "Dengan nama Allah."}, {"id": "dh14", "tajuk": "Doa Selepas Makan", "arab": "اَلْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنَا وَسَقَانَا وَجَعَلَنَا مِنَ الْمُسْلِمِينَ", "rumi": "Alhamdulillaahil ladzii ath'amanaa wa saqaanaa wa ja'alanaa minal muslimiin.", "maksud": "Segala puji bagi Allah yang telah memberi kami makan dan minum, dan telah menjadikan kami sebagai seorang muslim."}, {"id": "dh15", "tajuk": "Doa Sebelum Belajar", "arab": "رَضِيتُ بِاللهِ رَبًّا وَبِالْإِسْلَامِ دِينًا وَبِمُحَمَّدٍ نَبِيًّا وَرَسُولًا رَبِّ زِدْنِي عِلْمًا وَارْزُقْنِي فَهْمًا", "rumi": "Radhiitu billaahi rabban wa bil islaami diinan wa bi muhammadin nabiyyan wa rasuulan. Rabbi zidnii 'ilmaa warzuqnii fahmaa.", "maksud": "Redha Allah sebagai Tuhanku, Islam sebagai agamaku dan Nabi Muhammad sebagai Rasul. Ya Allah, tambahkan kepadaku ilmu dan berikan aku pemahaman yang baik."}, {"id": "dh16", "tajuk": "Doa Selepas Belajar", "arab": "اَللَّهُمَّ أَرِنَا الْحَقَّ حَقًّا وَارْزُقْنَا اتِّبَاعَهُ وَأَرِنَا الْبَاطِلَ بَاطِلًا وَارْزُقْنَا اجْتِنَابَهُ", "rumi": "Allahumma arinal haqqa haqqan warzuqnat tibaa'ahu wa arinal baathila baathilan warzuqnaj tinaabahu.", "maksud": "Ya Allah, tunjukkanlah kepada kami kebenaran sehingga kami boleh mengikutinya, dan tunjukkanlah kepada kami keburukan sehingga kami dapat menjauhinya."}, {"id": "dh17", "tajuk": "Doa Untuk Ilmu", "arab": "رَبِّ زِدْنِي عِلْمًا", "rumi": "Rabbi zidnii 'ilmaa.", "maksud": "Ya Tuhanku, tambahkanlah kepadaku ilmu."}, {"id": "dh18", "tajuk": "Doa Keluar Rumah", "arab": "بِسْمِ اللهِ تَوَكَّلْتُ عَلَى اللهِ وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللهِ الْعَلِيِّ الْعَظِيمِ", "rumi": "Bismillahi tawakkaltu 'alallaahi wa laa hawla wa laa quwwata illaa billaahil 'aliyyil 'azhiim.", "maksud": "Dengan nama Allah, aku bertawakal kepada Allah. Tidak ada daya dan kekuatan kecuali dengan pertolongan Allah Yang Maha Tinggi lagi Maha Agung."}, {"id": "dh19", "tajuk": "Doa Masuk Rumah", "arab": "اَللَّهُمَّ إِنِّي أَسْأَلُكَ خَيْرَ الْمَوْلِجِ وَخَيْرَ الْمَخْرَجِ، بِسْمِ اللهِ وَلَجْنَا وَبِسْمِ اللهِ خَرَجْنَا وَعَلَى اللهِ رَبِّنَا تَوَكَّلْنَا", "rumi": "Allaahumma innii as'aluka khairal mawliji wa khairal makhraji, bismillaahi walajna wa bismillaahi kharajna wa 'alallaahi rabbinaa tawakkalnaa.", "maksud": "Wahai Allah, aku memohon sebaik-baik tempat masuk dan sebaik-baik tempat keluar. Atas nama-Mu kami masuk dan atas nama-Mu kami keluar, dan kepada Allah Tuhan kamilah kami bertawakal."}, {"id": "dh20", "tajuk": "Doa Naik Kenderaan", "arab": "سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ وَإِنَّا إِلَى رَبِّنَا لَمُنْقَلِبُونَ", "rumi": "Subhaanalladzi sakhkhara lanaa haadzaa wa maa kunnaa lahu muqriniin, wa innaa ilaa rabbinaa lamunqalibuun.", "maksud": "Maha Suci Tuhan yang telah menundukkan semua ini bagi kami. Padahal kami sebelumnya tidak mampu menguasainya. Sungguh, kami akan kembali kepada Tuhan kami."}, {"id": "dh21", "tajuk": "Doa Untuk Perjalanan", "arab": "سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ", "rumi": "Subhaanal ladzii sakhkhara lanaa haadzaa wa maa kunnaa lahu muqriniin.", "maksud": "Maha Suci Dia, yang telah menundukkan ini kepada kami, dan kami tidak dapat melakukannya sendiri."}, {"id": "dh22", "tajuk": "Doa Ketika Hujan", "arab": "اَللَّهُمَّ صَيِّبًا هَنِيئًا وَسَيِّبًا نَافِعًا", "rumi": "Allaahumma shayyiban haniyyan wa sayyiban naafi'an.", "maksud": "Wahai Tuhanku, jadikan ini hujan terpuji kesudahannya dan menjadi aliran air yang bermanfaat."}, {"id": "dh23", "tajuk": "Doa Setelah Mendengar Guruh", "arab": "سُبْحَانَ الَّذِي يُسَبِّحُ الرَّعْدُ بِحَمْدِهِ وَالْمَلَائِكَةُ مِنْ خِيفَتِهِ", "rumi": "Subhaanal ladzii yusabbihur ra'du bihamdihi wal malaa'ikatu min khiifatihi.", "maksud": "Maha Suci Allah yang guruh dan para malaikat bertasbih dengan memuji-Nya kerana takut kepada-Nya."}, {"id": "dh24", "tajuk": "Doa Ketika Bercermin", "arab": "اَللَّهُمَّ كَمَا حَسَّنْتَ خَلْقِي فَحَسِّنْ خُلُقِي", "rumi": "Allaahumma kamaa hassanta khalqii fahassin khuluqii.", "maksud": "Wahai Tuhanku, sebagaimana telah Kau perelokkan kejadianku, maka baguskanlah perangaiku."}, {"id": "dh25", "tajuk": "Doa Ketika Bersin", "arab": "اَلْحَمْدُ لِلَّهِ", "rumi": "Alhamdulillah.", "maksud": "Segala puji bagi Allah."}, {"id": "dh26", "tajuk": "Doa Mendengar Orang Bersin", "arab": "يَرْحَمُكَ اللهُ", "rumi": "Yarhakumullahu.", "maksud": "Semoga Allah merahmatimu."}, {"id": "dh27", "tajuk": "Doa Sebelum Memasuki Pasaran", "arab": "لَا إِلَهَ إِلَّا اللهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ يُحْيِي وَيُمِيتُ وَهُوَ حَيٌّ لَا يَمُوتُ بِيَدِهِ الْخَيْرُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ", "rumi": "Laa ilaaha illallaahu wahdahu laa syariika lahu, lahul mulku wa lahul hamdu yuhyii wa yumiitu wa huwa hayyun laa yamuutu biyadihil khairu wa huwa 'alaa kulli syai'in qadiir.", "maksud": "Tiada Tuhan selain Allah Yang Maha Esa, tiada sekutu bagi-Nya, bagi-Nya kerajaan dan bagi-Nya segala pujian. Dia menghidupkan dan mematikan, Dia Maha Hidup dan tidak mati, di tangan-Nya segala kebaikan, dan Dia Maha Kuasa atas semua perkara."}, {"id": "dh28", "tajuk": "Doa Untuk Orang Tua", "arab": "اَللَّهُمَّ اغْفِرْ لِي وَلِوَالِدَيَّ وَارْحَمْهُمَا كَمَا رَبَّيَانِي صَغِيرًا", "rumi": "Allaahummaghfir lii wa liwaalidayya warhammhumaa kamaa rabbayaani shaghiiraa.", "maksud": "Wahai Tuhanku, ampunilah aku dan kedua orang tuaku (ibu dan bapaku), sayangilah mereka seperti mereka menyayangiku waktu aku kecil."}, {"id": "dh29", "tajuk": "Doa Untuk Ibu Bapa", "arab": "رَبِّ ارْحَمْهُمَا كَمَا رَبَّيَانِي صَغِيرًا", "rumi": "Rabbir hamhumaa kamaa rabbayaanii shaghiiraa.", "maksud": "Wahai Tuhanku, kasihanilah mereka sebagaimana mereka membawa aku semasa aku kecil."}, {"id": "dh30", "tajuk": "Doa Untuk Kesihatan", "arab": "اَللَّهُمَّ عَافِنِي فِي بَدَنِي", "rumi": "Allaahumma 'aafinii fii badanii.", "maksud": "Ya Allah, kurniakanlah kesihatan tubuh badanku."}, {"id": "dh31", "tajuk": "Doa Untuk Penyembuhan", "arab": "اَللَّهُمَّ اشْفِنِي شِفَاءً لَا يُغَادِرُ سَقَمًا", "rumi": "Allaahummasyfini shifaa'an laa yughaadiru saqaman.", "maksud": "Ya Allah, sembuhkanlah aku dengan penawar yang tidak meninggalkan penyakit."}, {"id": "dh32", "tajuk": "Doa Untuk Menziarah Orang Sakit", "arab": "أَسْأَلُ اللهَ الْعَظِيمَ رَبَّ الْعَرْشِ الْعَظِيمِ أَنْ يَشْفِيَكَ", "rumi": "As'alullahal 'azhiima rabbal 'arsyil 'azhiimi an yasyfiyaka.", "maksud": "Aku memohon kepada Allah Yang Maha Perkasa, Tuhan yang mempunyai Arasy yang Maha Agung, agar menyembuhkanmu."}, {"id": "dh33", "tajuk": "Doa Untuk Perlindungan", "arab": "اَللَّهُمَّ احْفَظْنِي مِنْ بَيْنِ يَدَيَّ وَمِنْ خَلْفِي", "rumi": "Allaahummahfazhnii min bayni yadayya wa min khalfii.", "maksud": "Ya Allah, lindungilah aku dari hadapan dan dari belakangku."}, {"id": "dh34", "tajuk": "Doa Perlindungan dari Syaitan", "arab": "بِسْمِ اللهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ", "rumi": "Bismillaahil ladzii laa yadhurru ma'asmihi syai'un fil ardhi wa laa fis samaa'i wa huwas samii'ul 'aliim.", "maksud": "Dengan nama Allah yang dengan nama-Nya tidak ada sesuatu pun di langit dan di bumi yang dapat membahayakan, dan Dialah Yang Maha Mendengar lagi Maha Mengetahui."}, {"id": "dh35", "tajuk": "Doa Masuk Tempat Baru", "arab": "أَعُوذُ بِكَلِمَاتِ اللهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ", "rumi": "A'uudzu bikalimaatillaahit taammati min syarri maa khalaq.", "maksud": "Aku berlindung dengan kalimat-kalimat Allah yang sempurna dari kejahatan makhluk-Nya."}, {"id": "dh36", "tajuk": "Doa Ketika Rasa Takut atau Dalam Masalah", "arab": "حَسْبُنَا اللهُ وَنِعْمَ الْوَكِيلُ", "rumi": "Hasbunallaahu wa ni'mal wakiil.", "maksud": "Cukuplah Allah bagi kami dan Dialah sebaik-baik Pelindung."}, {"id": "dh37", "tajuk": "Doa Agar Dimudahkan Segala Urusan", "arab": "رَبِّ اشْرَحْ لِي صَدْرِي وَيَسِّرْ لِي أَمْرِي", "rumi": "Rabbisyrah lii shadrii wa yassir lii amrii.", "maksud": "Ya Tuhanku, lapangkanlah untukku dadaku, dan mudahkanlah untukku urusanku."}, {"id": "dh38", "tajuk": "Doa Ketika Tugasan Sukar", "arab": "اَللَّهُمَّ لَا سَهْلَ إِلَّا مَا جَعَلْتَهُ سَهْلًا وَأَنْتَ تَجْعَلُ الْحَزَنَ إِذَا شِئْتَ سَهْلًا", "rumi": "Allaahumma laa sahla illaa maa ja'altahu sahlan wa anta taj'alul hazana idzaa syi'ta sahlan.", "maksud": "Ya Allah, tidak ada yang mudah kecuali yang Engkau jadikan mudah, dan Engkau jadikan kesedihan, jika Engkau kehendaki, menjadi mudah."}, {"id": "dh39", "tajuk": "Doa Lepas dari Kesedihan", "arab": "اَللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحُزْنِ", "rumi": "Allaahumma innii a'uudzu bika minal hammi wal huzni.", "maksud": "Ya Allah, aku berlindung kepada-Mu dari kesusahan dan kesedihan."}, {"id": "dh40", "tajuk": "Doa Untuk Perwatakan yang Baik", "arab": "اَللَّهُمَّ اهْدِنِي لِأَحْسَنِ الْأَخْلَاقِ", "rumi": "Allaahummahdini li'ahsanil akhlaaqi.", "maksud": "Ya Allah, bimbinglah aku kepada akhlak yang baik."}, {"id": "dh41", "tajuk": "Doa Setelah Mendengar Berita Baik", "arab": "اَللَّهُمَّ لَكَ الْحَمْدُ وَإِلَيْكَ الْمُشْتَكَى وَأَنْتَ الْمُسْتَعَانُ وَبِكَ الثِّقَةُ وَإِلَيْكَ الْمُشْتَكَى", "rumi": "Allaahumma lakal hamdu wa ilayka al mushtakaa wa antal musta'aanu wa bikal thiqatu wa ilayka al mushtakaa.", "maksud": "Ya Allah, kepada-Mulah segala pujian, dan kepada-Mu kami mengadu, dan kepada-Mu kami memohon pertolongan, kepada-Mu kami bertawakkal, dan kepada-Mu kami bertaubat di waktu susah."}];
+const WIRID_BONUS=35;
+
+/* ===== Nama fail audio bagi setiap kad Wirid =====
+   Letak fail .mp3 dalam folder ./audio/ dan isi nama fail di sini.
+   Kosong ("") = butang audio tak dipaparkan untuk kad tersebut. */
+const WIRID_AUDIO={
+  w01:"Istighfar.mp3",
+  w02:"Pengakuan Tauhid.mp3",
+  w03:"Dijauhkan Azab Neraka.mp3",
+  w04:"Zikir Memohon Keselamatan.mp3",
+  w05:"Taawwuz.mp3",
+  w06:"Al-Fatihah.mp3",
+  w06b:"Al-Baqarah 163.mp3",
+  w07:"Ayat Kursi.mp3",
+  w08:"Al-Ikhlas.mp3",
+  w09:"Al-Falaq.mp3",
+  w10:"An-Naas.mp3",
+  w11:"Tasbih Pembuka.mp3",
+  w12:"Subhanallah.mp3",
+  w13:"Tahmid Pembuka.mp3",
+  w14:"Alhamdulillah.mp3",
+  w15:"Takbir Pembuka.mp3",
+  w16:"Allahu Akbar.mp3",
+  w17:"Pelengkap Tasbih Tahmid Takbir.mp3",
+  w18:"Doa Penutup Wirid (Taawwuz, Bismillah dan Puji-pujian kepada Allah dalam doa).mp3",
+  w19:"Doa Penutup Wirid (Tahmid dlm doa).mp3",
+  w20:"Doa Penutup Wirid (Doa untuk Ibu Bapa).mp3",
+  w21:"Doa Penutup Wirid (Doa Selamat Dunia dan Akhirat).mp3",
+  w22:"Doa Penutup Wirid (Doa Zikir, Syukur dan Ibadah yang Baik).mp3",
+  w23:"Doa Memohon Keampunan dan Rahmat Allah.mp3",
+  w24:"Doa Memohon Keteguhan Hati di Atas Hidayah.mp3",
+  w25:"Doa Memohon Keampunan atas Kelalaian dan Kesilapan.mp3",
+  w26:"Doa Memohon Keringanan Beban, Keampunan dan Pertolongan Allah.mp3",
+  w27:"Doa Memohon Keluarga yang Soleh dan Penyejuk Hati.mp3",
+  w28:"Doa Sapu Jagat.mp3",
+  w29:"Selawat Penutup Doa.mp3",
+  w30:"Penutup Wirid 6.mp3",
+  w32:"Selawat Nuril Anwar.mp3",
+  w33:"Selawat Shifa.mp3",
+  w34:"Al-Maidah 114.mp3",
+  w35:"Selawat Ibrahimiyyah.mp3",
+  w36:"Doa untuk Guru.mp3",
+  w37:"Doa utk Semua.mp3"
+};
+
+const NIAT_DATA=[
+  {label:"Solat Fardhu",items:[
+    {tajuk:"Subuh",arab:"أُصَلِّيْ فَرْضَ الصُّبْحِ رَكْعَتَيْنِ أَدَاءً لِلَّهِ تَعَالَى",rumi:"Usolli Fardhas-subhi Rak'ataini Ada'an Lillahi Taala.",maksud:"Sahaja aku solat fardu subuh dua rakaat tunai kerana Allah Taala."},
+    {tajuk:"Zohor",arab:"أُصَلِّيْ فَرْضَ الظُّهْرِ أَرْبَعَ رَكَعَاتٍ أَدَاءً لِلَّهِ تَعَالَى",rumi:"Usolli Fardoz Zuhri Arba'a Raka'atin Ada'an Lillahi Taala.",maksud:"Sahaja aku solat fardu zohor empat rakaat tunai kerana Allah Taala."},
+    {tajuk:"Asar",arab:"أُصَلِّيْ فَرْضَ الْعَصْرِ أَرْبَعَ رَكَعَاتٍ أَدَاءً لِلَّهِ تَعَالَى",rumi:"Usolli Fardol Asri Arba'a Raka'atin Ada'an Lillahi Taala.",maksud:"Sahaja aku solat fardu Asar empat rakaat tunai kerana Allah Taala."},
+    {tajuk:"Maghrib",arab:"أُصَلِّيْ فَرْضَ الْمَغْرِبِ ثَلَاثَ رَكَعَاتٍ أَدَاءً لِلَّهِ تَعَالَى",rumi:"Usolli Fardhal Maghribi Salasa Raka'atin Adaan Lillahi Ta'ala.",maksud:"Sahaja aku solat fardu maghrib tiga rakaat tunai kerana Allah Taala."},
+    {tajuk:"Isyak",arab:"أُصَلِّيْ فَرْضَ الْعِشَاءِ أَرْبَعَ رَكَعَاتٍ أَدَاءً لِلَّهِ تَعَالَى",rumi:"Usolli Fardol Isya'i Arba'a Raka'atin Ada'an Lillahi Taala.",maksud:"Sahaja aku solat fardu Isyak empat rakaat tunai kerana Allah Taala."}
+  ]},
+  {label:"Solat Jumaat",items:[
+    {tajuk:"Jumaat (Makmum)",arab:"أُصَلِّيْ فَرْضَ الْجُمْعَةِ رَكْعَتَيْنِ مَأْمُومًا لِلَّهِ تَعَالَى",rumi:"Usolli Fardol Jum'ati Rak'ataini Makmuman Lillahi Taala.",maksud:"Sahaja aku solat fardu Jumaat dua rakaat menjadi makmum kerana Allah Taala."}
+  ]},
+  {label:"Jamak Taqdim",note:"Dilakukan dalam waktu solat yang pertama. Mulakan dengan solat pertama dahulu.",items:[
+    {tajuk:"Zohor (dengan Asar)",arab:"أُصَلِّيْ فَرْضَ الظُّهْرِ قَصْرًا رَكْعَتَيْنِ جَمْعَ تَقْدِيمٍ لِلَّهِ تَعَالَى",rumi:"Usolli Fardol Zuhri Qosron Rak'ataini Jama'a Takdiimin Lillahi Taala.",maksud:"Sahaja aku solat fardu Zohor, qasar dua rakaat jamak takdim kerana Allah Taala."},
+    {tajuk:"Asar (dengan Zohor)",arab:"أُصَلِّيْ فَرْضَ الْعَصْرِ قَصْرًا رَكْعَتَيْنِ جَمْعَ تَقْدِيمٍ لِلَّهِ تَعَالَى",rumi:"Usolli Fardol 'Asri Qosron Rak'ataini Jama'a Takdiimin Lillahi Taala.",maksud:"Sahaja aku solat fardu Asar, qasar dua rakaat jamak takdim kerana Allah Taala."},
+    {tajuk:"Maghrib (dengan Isyak)",arab:"أُصَلِّيْ فَرْضَ الْمَغْرِبِ ثَلَاثَ رَكَعَاتٍ جَمْعَ تَقْدِيمٍ لِلَّهِ تَعَالَى",rumi:"Usolli Fardol Maghribi Salasa Raka'atin Jama'a Takdiimin Lillahi Taala.",maksud:"Sahaja aku solat fardu Maghrib, tiga rakaat jamak takdim kerana Allah Taala."},
+    {tajuk:"Isyak (dengan Maghrib)",arab:"أُصَلِّيْ فَرْضَ الْعِشَاءِ قَصْرًا رَكْعَتَيْنِ جَمْعَ تَقْدِيمٍ لِلَّهِ تَعَالَى",rumi:"Usolli Fardol Isya'i Qosron Rak'ataini Jama'a Takdiimin Lillahi Taala.",maksud:"Sahaja aku solat fardu Isyak, qasar dua rakaat jamak takdim kerana Allah Taala."}
+  ]},
+  {label:"Jamak Takhir",note:"Dilakukan dalam waktu solat yang kedua. Mulakan dengan solat yang kedua terlebih dahulu.",items:[
+    {tajuk:"Asar (dengan Zohor)",arab:"أُصَلِّيْ فَرْضَ الْعَصْرِ قَصْرًا رَكْعَتَيْنِ جَمْعَ تَأْخِيرٍ لِلَّهِ تَعَالَى",rumi:"Usolli Fardol Asri Qosron Rak'ataini Jam'a Takhirin Lillahi Taala.",maksud:"Sahaja aku solat fardu Asar, qasar dua rakaat jamak takhir kerana Allah Taala."},
+    {tajuk:"Zohor (dengan Asar)",arab:"أُصَلِّيْ فَرْضَ الظُّهْرِ قَصْرًا رَكْعَتَيْنِ جَمْعَ تَأْخِيرٍ لِلَّهِ تَعَالَى",rumi:"Usolli Fardol Zuhri Qosron Rak'ataini Jam'a Takhirin Lillahi Taala.",maksud:"Sahaja aku solat fardu Zohor, qasar dua rakaat jamak takhir kerana Allah Taala."},
+    {tajuk:"Isyak (dengan Maghrib)",arab:"أُصَلِّيْ فَرْضَ الْعِشَاءِ قَصْرًا رَكْعَتَيْنِ جَمْعَ تَأْخِيرٍ لِلَّهِ تَعَالَى",rumi:"Usolli Fardol Isya'i Qosron Rak'ataini Jama'a Takhirin Lillahi Taala.",maksud:"Sahaja aku solat fardu Isyak, qasar dua rakaat jamak takhir kerana Allah Taala."},
+    {tajuk:"Maghrib (dengan Isyak)",arab:"أُصَلِّيْ فَرْضَ الْمَغْرِبِ ثَلَاثَ رَكَعَاتٍ جَمْعَ تَأْخِيرٍ لِلَّهِ تَعَالَى",rumi:"Usolli Fardol Maghribi Salasa Raka'atin Jama'a Takhirin Lillahi Taala.",maksud:"Sahaja aku solat fardu Maghrib tiga rakaat jamak takhir kerana Allah Taala."}
+  ]},
+  {label:"Jamak Hari Jumaat",note:"Menurut mazhab Syafie, hanya jamak takdim. Tunaikan solat Jumaat seperti biasa dahulu, kemudian selepas memberi salam terus bangun dan berniat solat Asar.",items:[
+    {tajuk:"Asar (selepas Jumaat)",arab:"أُصَلِّيْ فَرْضَ الْعَصْرِ قَصْرًا رَكْعَتَيْنِ جَمْعَ تَقْدِيمٍ لِلَّهِ تَعَالَى",rumi:"Usolli Fardol 'Asri Qosron Rak'ataini Jama'a Takdiimin Lillahi Taala.",maksud:"Sahaja aku solat fardu Asar, qasar dua rakaat jamak takdim kerana Allah Taala."}
+  ]}
+];
+SOLAT.unshift({id:"s0",tajuk:"Niat Solat",step:"Sebelum Solat",niat:true});
+
+function niatHTML(){
+  let h='';
+  NIAT_DATA.forEach((sec,si)=>{
+    h+=`<div class="niat-sec-title${si===0?' first':''}">${sec.label}</div>`;
+    if(sec.note) h+=`<div class="niat-note">${sec.note}</div>`;
+    sec.items.forEach((it,ii)=>{
+      const ak=si+'_'+ii;
+      const abtn=(typeof NIAT_AUDIO!=='undefined'&&NIAT_AUDIO[ak])?`<button class="niat-audio-btn" onclick="playNiatAudio('${ak}',this)" aria-label="Main audio niat">\u25B6</button>`:'';
+      h+=`<div class="niat-item">
+        <div class="niat-item-title">${it.tajuk}${abtn}</div>
+        <div class="arab-uni-wrap"><div class="arab-uni-text">${it.arab}</div></div>
+        <div class="rumi-sec solat"><div class="sec-lbl solat">Rumi</div><div class="rumi-txt solat">${it.rumi}</div></div>
+        <div class="mak-sec"><div class="sec-lbl solat">Maksud</div><div class="mak-txt">${it.maksud}</div></div>
+      </div>`;
+    });
+  });
+  return h;
+}
+
+let section=null,cards=[],current=0,isAnim=false,fromGrid=false;
+let cardAudio=null;
+let niatAudio=null;
+/* ===== Audio individu bagi setiap niat (kunci: indeksKumpulan_indeksItem) ===== */
+const NIAT_AUDIO={
+  "0_0":"Niat Subuh.mp3",
+  "0_1":"Niat Zohor.mp3",
+  "0_2":"Niat Asar.mp3",
+  "0_3":"Niat Maghrib.mp3",
+  "0_4":"Niat Isyak.mp3",
+  "1_0":"Niat Jumaat.mp3",
+  "2_0":"Niat Jamak Taqdim Zohor.mp3",
+  "2_1":"Niat Jamak Taqdim Asar.mp3",
+  "2_2":"Niat Jamak Taqdim Maghrib.mp3",
+  "2_3":"Niat Jamak Taqdim Isyak.mp3",
+  "3_0":"Niat Jamak Takhir Asar.mp3",
+  "3_1":"Niat Jamak Takhir Zohor.mp3",
+  "3_2":"Niat Jamak Takhir Isyak.mp3",
+  "3_3":"Niat Jamak Takhir Maghrib.mp3",
+  "4_0":"Niat Jamak Asar Hari Jumaat.mp3"
+};
+function playNiatAudio(key,btnEl){
+  const f=(typeof NIAT_AUDIO!=='undefined')?NIAT_AUDIO[key]:null;
+  if(!f) return;
+  if(!niatAudio){niatAudio=new Audio();niatAudio.preload='none';}
+  if(cardAudio&&!cardAudio.paused){try{cardAudio.pause();}catch(e){}}
+  document.querySelectorAll('.niat-audio-btn').forEach(function(b){if(b!==btnEl)b.textContent='\u25B6';});
+  if(niatAudio.getAttribute('data-key')===key&&!niatAudio.paused){niatAudio.pause();niatAudio.currentTime=0;btnEl.textContent='\u25B6';return;}
+  try{niatAudio.pause();}catch(e){}
+  niatAudio.src='./audio/'+encodeURIComponent(f);
+  niatAudio.setAttribute('data-key',key);
+  niatAudio.onended=function(){btnEl.textContent='\u25B6';};
+  niatAudio.onerror=function(){btnEl.textContent='\u25B6';};
+  niatAudio.play().then(function(){btnEl.textContent='\u23F8';}).catch(function(){btnEl.textContent='\u25B6';});
+}
+function fmtTime(s){s=Math.floor(s||0);const m=Math.floor(s/60);const ss=(s%60).toString().padStart(2,'0');return m+':'+ss;}
+function stopAudio(){if(cardAudio){try{cardAudio.pause();cardAudio.currentTime=0;}catch(e){}}if(niatAudio){try{niatAudio.pause();niatAudio.currentTime=0;}catch(e){}}document.querySelectorAll('.niat-audio-btn').forEach(function(b){b.textContent='\u25B6';});}
+function wireAudio(dir,file){
+  const bar=document.getElementById('audioBar');if(!bar)return;
+  const btn=document.getElementById('audioBtn');
+  const prog=document.getElementById('audioProg');
+  const fill=document.getElementById('audioProgFill');
+  const tEl=document.getElementById('audioTime');
+  if(!cardAudio){cardAudio=new Audio();cardAudio.preload='none';}
+  const src=dir+'/'+encodeURIComponent(file);
+  const key=dir+'/'+file;
+  fill.style.width='0%';tEl.textContent='0:00';btn.textContent='▶';
+  cardAudio.onended=function(){btn.textContent='▶';fill.style.width='0%';tEl.textContent='0:00';};
+  cardAudio.ontimeupdate=function(){if(cardAudio.duration){fill.style.width=(cardAudio.currentTime/cardAudio.duration*100)+'%';tEl.textContent=fmtTime(cardAudio.currentTime);}};
+  cardAudio.onerror=function(){bar.style.display='none';};
+  btn.onclick=function(){
+    if(cardAudio.paused){
+      if(cardAudio.getAttribute('data-file')!==key){cardAudio.src=src;cardAudio.setAttribute('data-file',key);}
+      cardAudio.play().then(function(){btn.textContent='⏸';}).catch(function(){bar.style.display='none';});
+    }else{cardAudio.pause();btn.textContent='▶';}
+  };
+  prog.onclick=function(e){
+    if(!cardAudio.duration)return;
+    const r=prog.getBoundingClientRect();
+    const ratio=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width));
+    cardAudio.currentTime=ratio*cardAudio.duration;
+  };
+}
+
+const MATHURAT=[
+  {id:"m01",num:1,tajuk:"Ta'awwuz (Isti'azah)",kali:"",arab_unicode:"أَعُوذُ بِاللهِ مِنَ الشَّيْطَانِ الرَّجِيمِ",rumi:"A'uzu billahi minasy-syaitanir rajim.",maksud:"Aku berlindung dengan Allah dari gangguan syaitan yang terkutuk."},
+  {id:"m02",rumi:"(1) Bismillahir Rahmanir Rahim. (2) Alhamdu Lillahi Rabbil Alamin. (3) Ar Rahmanir Rahim. (4) Maliki Yawmid Din. (5) Iyyaka Na'budu Wa Iyyaka Nasta'in. (6) Ihdinas Siratal Mustaqim. (7) Siratal Lazina An'amta Alayhim Ghayril Maghdubi Alayhim Wa Lad Dallin.",num:2,tajuk:"Surah Al-Fatihah: 1-7",kali:"",quran:true,img:"./quran-img/Al-Fatihah.jpg",maksud:"Dengan nama Allah, Yang Maha Pemurah, lagi Maha Mengasihani. Segala puji tertentu bagi Allah, Tuhan yang memelihara dan mentadbirkan sekalian 'alam. Yang Maha Pemurah, lagi Maha Mengasihani. Yang Menguasai pemerintahan Hari Pembalasan (Hari Akhirat). Engkaulah sahaja (Ya Allah) yang kami sembah, dan kepada Engkaulah sahaja kami memohon pertolongan. Tunjuklah kami jalan yang lurus. Iaitu jalan orang yang Engkau telah kurniakan nikmat kepada mereka, bukan (jalan) orang Engkau telah murkai, dan bukan pula (jalan) orang yang sesat."},
+  {id:"m03",rumi:"Bismillahir Rahmanir Rahim. (1) Alif Lam Mim. (2) Zalikal Kitabu La Rayba Fih, Hudal Lil Muttaqin. (3) Allazina Yu'minuna Bil Ghaybi Wa Yuqimunas Salata Wa Mimma Razaqnahum Yunfiqun. (4) Wallazina Yu'minuna Bima Unzila Ilayka Wa Ma Unzila Min Qablika, Wa Bil Akhirati Hum Yuqinun. (5) Ula'ika Ala Hudam Mir Rabbihim, Wa Ula'ika Humul Muflihun.",num:3,tajuk:"Surah Al-Baqarah: 1-5",kali:"",quran:true,img:"./quran-img/Al-Baqarah 1-5.jpg",maksud:"Alif, Laam, Miim. Kitab Al-Qur'an ini, tidak ada sebarang syak padanya (tentang datangnya dari Allah dan tentang sempurnanya); ia pula menjadi petunjuk bagi orang-orang yang (hendak) bertakwa; Iaitu orang-orang yang beriman kepada perkara-perkara yang ghaib, dan mendirikan (mengerjakan) sembahyang serta membelanjakan (menderma) sebahagian dari rezeki yang Kami berikan kepada mereka. Dan juga orang-orang yang beriman kepada Kitab \"al-Qur'an\" yang diturunkan kepadamu (wahai Muhammad), dan kitab-kitab yang diturunkan dahulu daripadamu, serta mereka yakin akan (adanya) hari akhirat (dengan sepenuhnya). Mereka itulah yang tetap mendapat pertunjuk dari Tuhan mereka, dan merekalah orang-orang yang berjaya."},
+  {id:"m04",rumi:"(255) Allahu La Ilaha Illa Huwal Hayyul Qayyum, La Takhuzuhu Sinatun Wa La Naum, Lahu Ma Fis Samawati Wa Ma Fil Ard, Man Zallazi Yasyfau Indahu Illa Bi Iznih, Ya'lamu Ma Bayna Aidihim Wa Ma Khalfahum, Wa La Yuhituna Bi Syai'im Min Ilmihi Illa Bima Sya', Wasi'a Kursiyyuhus Samawati Wal Ard, Wa La Ya'uduhu Hifzuhuma, Wa Huwal Aliyyul Azim.",num:4,tajuk:"Surah Al-Baqarah: 255 (Ayat Kursi)",kali:"",quran:true,img:"./quran-img/Ayat Kursi.jpg",maksud:"Allah, tiada Tuhan (yang berhak disembah) melainkan Dia, Yang Tetap Hidup, Yang Kekal selama-lamanya mentadbirkan (sekalian makhluknya-Nya). Yang tidak mengantuk usahkan tidur, Yang memiliki segala yang ada di langit dan yang ada di bumi. Tiada sesiapa yang dapat memberi syafa'at (pertolongan) di sisi-Nya melainkan dengan izin-Nya. Yang mengetahui apa yang ada di hadapan mereka dan apa yang ada di belakang mereka, sedang mereka tidak mengetahui sesuatu pun dari (kandungan) ilmu Allah melainkan apa yang Allah kehendaki (memberitahu kepadanya). Luasnya Kursi Allah (ilmu-Nya dan kekuasaan-Nya) meliputi langit dan bumi dan tiadalah menjadi keberatan kepada Allah menjaga serta memelihara keduanya. Dan Dialah Yang Maha Tinggi (darjat kemuliaan-Nya) lagi Maha Besar kekuasaan-Nya)."},
+  {id:"m05",rumi:"(256) La Ikraha Fid Din, Qat Tabayyanar Rusydu Minal Ghayy, Famay Yakfur Bit Taghuti Wa Yu'mim Billahi Faqadis Tamsaka Bil Urwatil Wusqa Lan Fisama Laha, Wallahu Sami'un Alim. (257) Allahu Waliyyul Lazina Amanu Yukhrijuhum Minaz Zulumati Ilan Nur, Wallazina Kafaru Awliya'uhumut Taghutu Yukhrijunahum Minan Nuri Ilaz Zulumat, Ula'ika As-habun Nari Hum Fiha Khalidun.",num:5,tajuk:"Surah Al-Baqarah: 256-257",kali:"",quran:true,img:"./quran-img/Al-Baqarah 256-257.jpg",maksud:"Tiada paksaan dalam agama (Islam), kerana sesungguhnya telah nyata kebenaran (Islam) dari kesesatan (kufur). Oleh itu, sesiapa yang tidak percayakan Taghut (syaitan, berhala dan apa sahaja yang menyesatkan), dan ia pula beriman kepada Allah, maka sesungguhnya ia telah berpegang kepada simpulan (tali agama) yang teguh, yang tidak akan putus. Dan (ingatlah), Allah Maha Mendengar lagi Maha Mengetahui. Allah Pelindung (Yang Mengawal dan Menolong) orang-orang yang beriman. Dia mengeluarkan mereka dari kegelapan kufur kepada cahaya (iman). Dan orang-orang kafir penolong mereka adalah Thaghut yang mengeluarkan mereka daripada cahaya (iman) kepada kegelapan kufur. Mereka itulah ahli neraka, mereka kekal di dalamnya."},
+  {id:"m06",rumi:"(284) Lillahi Ma Fis Samawati Wa Ma Fil Ard, Wa In Tubdu Ma Fi Anfusikum Aw Tukhfuhu Yuhasibkum Bihillah, Fayaghfiru Limay Yasya'u Wa Yuazzibu May Yasya', Wallahu Ala Kulli Syai'in Qadir. (285) Amanar Rasulu Bima Unzila Ilayhi Mir Rabbihi Wal Mu'minun, Kullun Amana Billahi Wa Mala'ikatihi Wa Kutubihi Wa Rusulih, La Nufarriqu Bayna Ahadim Mir Rusulih, Wa Qalu Sami'na Wa Ata'na, Ghufranaka Rabbana Wa Ilaykal Masir. (286) La Yukallifullahu Nafsan Illa Wus'aha, Laha Ma Kasabat Wa Alayha Mak Tasabat, Rabbana La Tu'akhizna In Nasina Aw Akhta'na, Rabbana Wa La Tahmil Alayna Isran Kama Hamaltahu Alal Lazina Min Qablina, Rabbana Wa La Tuhammilna Ma La Taqata Lana Bih, Wa'fu Anna, Waghfir Lana, War Hamna, Anta Mawlana Fansurna Alal Qawmil Kafirin.",num:6,tajuk:"Surah Al-Baqarah: 284-286",kali:"",quran:true,img:"./quran-img/Al-Baqarah 284-286.jpg",maksud:"Segala yang ada di langit dan yang ada di bumi adalah kepunyaan Allah. Dan jika kamu melahirkan apa yang ada di dalam hati kamu atau kamu menyembunyikannya, nescaya Allah akan menghitung dan menyatakannya kepada kamu. Kemudian Ia mengampunkan bagi sesiapa yang dikehendaki-Nya dan menyeksa sesiapa yang dikehendaki-Nya (menurut undang-undang peraturan-Nya). Dan (ingatlah), Allah Maha Kuasa atas tiap-tiap sesuatu. Rasulullah telah beriman kepada apa yang diturunkan kepadanya dari Tuhannya, dan juga orang-orang yang beriman; semuanya beriman kepada Allah, dan Malaikat-malaikat-Nya, dan Kitab-kitab-Nya, dan Rasul-rasul-Nya. (Mereka berkata): \"Kami tidak membezakan antara seorang dengan yang lain dari Rasul-rasul-Nya\". Mereka berkata lagi: \"Kami dengar dan kami taat. (Kami pohonkan) keampunan-Mu wahai Tuhan kami, dan kepada-Mu jualah tempat kembali\". Allah tidak memberati seseorang melainkan apa yang terdaya olehnya, dan ia mendapat pahala kebaikan yang diusahakanya juga menanggung dosa kejahatan yang diusahakannya. (Mereka berdoa dengan berkata): \"Wahai Tuhan kami! Janganlah Engkau mengirakan kami salah jika kami lupa atau kami tersalah. Wahai Tuhan kami! Janganlah Engkau bebankan kepada kami bebanan yang berat sebagaimana yang telah Engkau bebankan kepada orang-orang yang terdahulu daripada kami. Wahai Tuhan kami! Janganlah Engkau pikulkan kepada kami apa yang kami tidak terdaya memikulnya. Dan maafkanlah kesalahan kami serta ampunkanlah dosa kami, dan berilah rahmat kepada kami. Engkaulah Penolong kami; oleh itu, tolonglah kami untuk mencapai kemenangan terhadap kaum-kaum yang kafir.\""},
+  {id:"m07",rumi:"Bismillahir Rahmanir Rahim. (1) Ta Ha. (2) Ma Anzalna Alaykal Qur'ana Litasyqa.",num:7,tajuk:"Surah Taha: 1-2",kali:"",quran:true,img:"./quran-img/Surah Taha 1-2.jpg",maksud:"Taa, Haa. Kami tidak menurunkan Al-Qur'an kepadamu (wahai Muhammad) supaya engkau menanggung kesusahan."},
+  {id:"m08",rumi:"(111) Wa Anatil Wujuhu Lil Hayyil Qayyum, Wa Qad Khaba Man Hamala Zulma. (112) Wa May Ya'mal Minas Salihati Wa Huwa Mu'minun Fala Yakhafu Zulmaw Wa La Hadma.",num:8,tajuk:"Surah Taha: 111-112",kali:"",quran:true,img:"./quran-img/Surah Taha 111-112.jpg",maksud:"Dan segala muka akan tunduk dengan berupa hina kepada Allah Yang Tetap Hidup, lagi Yang Kekal Mentadbirkan makhluk selama-lamanya; dan sesungguhnya telah rugi dan hampalah orang yang menanggung dosa kezaliman. Dan sesiapa yang mengerjakan sebarang apa dari amal-amal yang salih, sedang ia beriman, maka tidaklah (seharusnya) ia merasa takut dianiayai atau dikurangkan sedikitpun dari pahalanya."},
+  {id:"m09",rumi:"(129) Fa In Tawallaw Faqul Hasbiyallahu La Ilaha Illa Huw, Alayhi Tawakkaltu Wa Huwa Rabbul Arsyil Azim.",num:9,tajuk:"Surah At-Taubah: 129",kali:"",quran:true,img:"./quran-img/At-Taubah 129.jpg",maksud:"Kemudian jika mereka berpaling ingkar, maka katakanlah (wahai Muhammad): \"Cukuplah bagiku Allah (yang menolong dan memeliharaku) tiada Tuhan (yang berhak disembah) melainkan Dia; kepada-Nya aku berserah diri dan Dialah yang mempunyai 'Arasy yang besar.\""},
+  {id:"m10",rumi:"(110) Qulid'ullaha Awid'ur Rahman, Ayyam Ma Tad'u Falahul Asma'ul Husna, Wa La Tajhar Bisalatika Wa La Tukhafit Biha Wabtaghi Bayna Zalika Sabila. (111) Wa Qulil Hamdu Lillahil Lazi Lam Yattakhiz Waladaw Wa Lam Yakul Lahu Syarikun Fil Mulki Wa Lam Yakul Lahu Waliyyum Minaz Zulli Wa Kabbirhu Takbira.",num:10,tajuk:"Surah Al-Israa': 110-111",kali:"",quran:true,img:"./quran-img/Al-Israa 110-111.jpg",maksud:"Katakanlah (wahai Muhammad): \"Serulah nama \"Allah\" atau nama \"Ar-Rahman\", yang mana sahaja kamu serukan (dari kedua-dua nama itu adalah baik belaka); kerana Allah mempunyai banyak nama-nama yang baik serta mulia.\" Dan janganlah engkau menyaringkan bacaan doa atau sembahyangmu, juga janganlah engkau perlahankannya, dan gunakanlah sahaja satu cara yang sederhana antara itu. Dan katakanlah: \"Segala puji tertentu bagi Allah, yang tiada mempunyai anak, dan tiada bagi-Nya sekutu dalam urusan kerajaan-Nya, dan tiada bagi-Nya penolong disebabkan sesuatu kelemahan-Nya; dan hendaklah engkau membesarkan serta memuliakan-Nya dengan bersungguh-sungguh\""},
+  {id:"m11",rumi:"(115) Afahasibtum Annama Khalaqnakum Abasaw Wa Annakum Ilayna La Turja'un. (116) Fata'alallahul Malikul Haqq, La Ilaha Illa Huwa Rabbul Arsyil Karim. (117) Wa May Yad'u Ma'allahi Ilahan Akhara La Burhana Lahu Bihi Fa Innama Hisabuhu Inda Rabbih, Innahu La Yuflihul Kafirun. (118) Wa Qur Rabbighfir War Ham Wa Anta Khayrur Rahimin.",num:11,tajuk:"Surah Al-Mukminun: 115-118",kali:"",quran:true,img:"./quran-img/Al-Mukminun 115-118.jpg",maksud:"Maka adakah patut kamu menyangka bahawa Kami hanya menciptakan kamu (dari tiada kepada ada) sahaja dengan tiada sebarang hikmah pada ciptaan itu? Dan kamu (menyangka pula) tidak akan dikembalikan kepada Kami? Maka (dengan yang demikian) Maha Tinggilah Allah Yang Menguasai seluruh alam, lagi Yang Tetap Benar; tiada Tuhan melainkan Dia, Tuhan yang mempunyai 'Arasy yang mulia. Dan sesiapa yang menyembah Tuhan yang lain bersama-sama Allah, dengan tidak berdasarkan sebarang keterangan mengenainya, maka sesungguhnya hitungannya (dan balasan amalnya yang jahat itu) disediakan di sisi Tuhannya. Sesungguhnya orang-orang yang kafir tidak akan berjaya. Dan berdoalah (wahai Muhammad dengan berkata): \"Wahai Tuhanku, berikanlah ampun dan kurniakan rahmat, dan sememangnya Engkaulah sahaja sebaik-baik Pemberi Rahmat\""},
+  {id:"m12",rumi:"(17) Fasubhanallahi Hina Tumsuna Wa Hina Tusbihun. (18) Wa Lahul Hamdu Fis Samawati Wal Ardi Wa Asyiyyaw Wa Hina Tuzhirun. (19) Yukhrijul Hayya Minal Mayyiti Wa Yukhrijul Mayyita Minal Hayyi Wa Yuhyil Arda Ba'da Mawtiha, Wa Kazalika Tukhrajun. (20) Wa Min Ayatihi An Khalaqakum Min Turabin Summa Iza Antum Basyarun Tantasyirun. (21) Wa Min Ayatihi An Khalaqa Lakum Min Anfusikum Azwajal Litaskunu Ilayha Wa Ja'ala Baynakum Mawaddataw Wa Rahmah, Inna Fi Zalika La'ayatil Liqawmiy Yatafakkarun. (22) Wa Min Ayatihi Khalqus Samawati Wal Ardi Wakhtilafu Alsinatikum Wa Alwanikum, Inna Fi Zalika La'ayatil Lil Alimin. (23) Wa Min Ayatihi Manamukum Bil Layli Wan Nahari Wabtigha'ukum Min Fadlih, Inna Fi Zalika La'ayatil Liqawmiy Yasma'un. (24) Wa Min Ayatihi Yurikumul Barqa Khawfaw Wa Tama'aw Wa Yunazzilu Minas Sama'i Ma'an Fayuhyi Bihil Arda Ba'da Mawtiha, Inna Fi Zalika La'ayatil Liqawmiy Ya'qilun. (25) Wa Min Ayatihi An Taqumas Sama'u Wal Ardu Bi Amrih, Summa Iza Da'akum Da'watam Minal Ardi Iza Antum Takhrujun. (26) Wa Lahu Man Fis Samawati Wal Ard, Kullul Lahu Qanitun.",num:12,tajuk:"Surah Ar-Rum: 17-26",kali:"",quran:true,img:"./quran-img/Ar-Rum 17-26.jpg",maksud:"(Setelah kamu mengetahui yang demikian), maka bertasbihlah kepada Allah semasa kamu berada pada waktu malam dan semasa kamu berada pada waktu subuh. Serta pujilah Allah yang berhak menerima segala puji (dari sekalian makhluk-Nya) di langit dan di bumi, dan juga (bertasbihlah kepada-Nya serta pujilah Dia) pada waktu petang dan semasa kamu berada pada waktu zuhur. Ia mengeluarkan sesuatu yang hidup dari benda yang mati, dan mengeluarkan benda yang mati dari sesuatu yang hidup, serta menghidupkan bumi sesudah matinya; dan sedemikian itulah kamu akan dikeluarkan (hidup semula dari kubur). Dan di antara tanda-tanda yang membuktikan kekuasaan-Nya (menghidupkan kamu semula), bahawa Ia menciptakan kamu dari tanah; setelah sempurna sahaja peringkat-peringkat kejadian kamu, kamu menjadi manusia yang hidup bertebaran di muka bumi. Dan di antara tanda-tanda yang membuktikan kekuasaan-Nya dan rahmat-Nya, bahawa Ia menciptakan untuk kamu (wahai kaum lelaki), isteri-isteri dari jenis kamu sendiri, supaya kamu bersenang hati dan hidup mesra dengannya, dan dijadikan-Nya di antara kamu (suami isteri) perasaan kasih sayang dan belas kasihan. Sesungguhnya yang demikian itu mengandungi keterangan-keterangan (yang menimbulkan kesedaran) bagi orang-orang yang berfikir. Dan di antara tanda-tanda yang membuktikan kekuasaan-Nya dan kebijaksanaan-Nya ialah kejadian langit dan bumi, dan perbezaan bahasa kamu dan warna kulit kamu. Sesungguhnya yang demikian itu mengandungi keterangan-keterangan bagi orang yang berpengetahuan. Dan di antara tanda-tanda yang membuktikan kemurahan-Nya dan kasih sayang-Nya ialah tidurnya kamu pada waktu malam dan pada siang hari, dan usaha kamu mencari rezeki dari limpah kurnia-Nya (pada kedua-dua waktu itu). Sesungguhnya yang demikian itu mengandungi keterangan-keterangan bagi orang-orang yang mahu mendengar (nasihat pengajaran). Dan di antara tanda-tanda yang membuktikan kebesaran-Nya dan kekuasaan-Nya, Ia memperlihatkan kilat kepada kamu, untuk menakutkan (dari panahan petir) dan memberi harapan (dengan turunnya hujan); dan Ia menurunkan hujan dari langit, lalu Ia hidupkan bumi sesudah matinya dengan hujan itu. Sesungguhnya yang demikan mengandungi keterangan-keterangan bagi orang-orang yang menggunakan akal untuk memahami-Nya. Dan di antara tanda-tanda yang membuktikan keluasan ilmu-Nya dan kekuasaan-Nya, ialah terdirinya langit dan bumi (dalam keadaan yang menakjubkan itu) dengan perintah dan penentuan takdir-Nya; akhirnya apabila Ia menyeru kamu dengan satu seruan (supaya kamu bangkit hidup semula) dari bumi, kamu dengan serta-merta keluar (dari kubur masing-masing). Dan sekalian makhluk yang ada di langit dan di bumi adalah hak kepunyaan-Nya, masing-masing tetap tunduk kepada hukum peraturan-Nya."},
+  {id:"m13",rumi:"Bismillahir Rahmanir Rahim. (1) Ha Mim. (2) Tanzilul Kitabi Minallahil Azizil Alim. (3) Ghafiriz Zambi Wa Qabilit Tawbi Syadidil Iqabi Zit Tawl, La Ilaha Illa Huw, Ilayhil Masir.",num:13,tajuk:"Surah Al-Mukmin: 1-3",kali:"",quran:true,img:"./quran-img/Al-Mukmin 1-3.jpg",maksud:"Haa, Miim. Turunya Al-Qur'an ini dari Allah Yang Maha Kuasa, lagi Maha Mengetahui;- Yang Mengampunkan dosa, dan Yang Menerima taubat; yang Berat azab-Nya; Yang Melimpah-limpah kurnia-Nya; tiada Tuhan melainkan Dia; kepada-Nyalah tempat kembali."},
+  {id:"m14",rumi:"(22) Huwallahul Lazi La Ilaha Illa Huw, Alimul Ghaybi Wasy Syahadah, Huwar Rahmanur Rahim. (23) Huwallahul Lazi La Ilaha Illa Huw, Al Malikul Quddusus Salamul Mu'minul Muhayminul Azizul Jabbarul Mutakabbir, Subhanallahi Amma Yusyrikun. (24) Huwallahul Khaliqul Bari'ul Musawwiru Lahul Asma'ul Husna, Yusabbihu Lahu Ma Fis Samawati Wal Ard, Wa Huwal Azizul Hakim.",num:14,tajuk:"Surah Al-Hasyr: 22-24",kali:"",quran:true,img:"./quran-img/Al-Hasyr 22-24.jpg",maksud:"Dialah Allah, yang tidak ada Tuhan melainkan Dia; Yang Mengetahui perkara yang ghaib dan yang nyata; Dialah Yang Maha Pemurah, lagi Maha Mengasihani. Dialah Allah, yang tidak ada Tuhan melainkan Dia; Yang Menguasai (sekalian alam); Yang Maha Suci; Yang Maha Selamat Sejahtera (dari segala kekurangan); Yang Melimpahkan Keamanan; Yang Maha Pengawal serta Pengawas; Yang Maha Kuasa; Yang Maha Kuat (menundukkan segala-galanya); Yang Melengkapi segala Kebesaran-Nya. Maha Suci Allah dari segala yang mereka sekutukan dengan-Nya. Dialah Allah, Yang Menciptakan sekalian makhluk; Yang Mengadakan (dari tiada kepada ada); Yang Membentuk rupa (makhluk-makhluk-Nya menurut yang dikehendaki-Nya); bagi-Nyalah nama-nama yang sebaik-baiknya dan semulia-mulianya; bertasbih kepada-Nya segala yang ada di langit dan di bumi; dan Dialah Yang tidak ada tolok banding-Nya, lagi Maha Bijaksana."},
+  {id:"m15",rumi:"Bismillahir Rahmanir Rahim. (1) Iza Zulzilatil Ardu Zilzalaha. (2) Wa Akhrajatil Ardu Asqalaha. (3) Wa Qalal Insanu Ma Laha. (4) Yawma'izin Tuhaddisu Akhbaraha. (5) Bi Anna Rabbaka Awha Laha. (6) Yawma'iziy Yasdurun Nasu Asytatal Liyuraw A'malahum. (7) Famay Ya'mal Misqala Zarratin Khayray Yarah. (8) Wa May Ya'mal Misqala Zarratin Syarray Yarah.",num:15,tajuk:"Surah Az-Zalzalah: 1-8",kali:"",quran:true,img:"./quran-img/Az-Zalzalah.jpg",maksud:"Apabila bumi digegarkan dengan gegaran yang sedasyat-dasyat-Nya, Serta bumi itu mengeluarkan segala isinya, Dan berkatalah manusia (dengan perasaaan gerun); \"Apa yang sudah terjadi kepada bumi?\" Pada hari itu bumi pun menceritakan khabar beritanya: Bahawa Tuhanmu telah memerintahnya (berlaku demikian). Pada hari itu manusia akan keluar berselerak (dari kubur masing-masing untuk diperlihatkan kepada mereka (balasan) amal-amal mereka. Maka sesiapa berbuat kebajikan seberat zarah, nescaya akan dilihatnya (dalam surat amalnya)! Dan sesiapa berbuat kejahatan seberat zarah, nescaya akan dilihatnya (dalam surat amalnya)"},
+  {id:"m16",rumi:"Bismillahir Rahmanir Rahim. (1) Qul Ya Ayyuhal Kafirun. (2) La A'budu Ma Ta'budun. (3) Wa La Antum Abiduna Ma A'bud. (4) Wa La Ana Abidum Ma Abattum. (5) Wa La Antum Abiduna Ma A'bud. (6) Lakum Dinukum Wa Liya Din.",num:16,tajuk:"Surah Al-Kafirun: 1-6",kali:"",quran:true,img:"./quran-img/Al-Kafirun.jpg",maksud:"Katakanlah (wahai Muhammad): \"Hai orang-orang kafir! Aku tidak akan menyembah apa yang kamu sembah. Dan kamu tidak mahu menyembah (Allah) yang aku sembah. Dan aku tidak akan beribadat secara kamu beribadat. Dan kamu pula tidak mahu beribadat secara aku beribadat. Bagi kamu agama kamu, dan bagiku agamaku.\""},
+  {id:"m17",rumi:"Bismillahir Rahmanir Rahim. (1) Iza Ja'a Nasrullahi Wal Fath. (2) Wa Ra'aytan Nasa Yadkhuluna Fi Dinillahi Afwaja. (3) Fasabbih Bihamdi Rabbika Wastaghfirh, Innahu Kana Tawwaba.",num:17,tajuk:"Surah An-Nasr: 1-3",kali:"",quran:true,img:"./quran-img/An-Nasr.jpg",maksud:"Apabila datang pertolongan Allah dan kemenangan (semasa engkau wahai Muhammad berjaya menguasai negeri Mekah), Dan engkau melihat manusia masuk dalam agama Allah beramai-ramai, Maka ucapkanlah tasbih dengan memuji Tuhanmu dan mintalah ampun kepada-Nya, sesungguhnya Ia sangat-sangat menerima taubat."},
+  {id:"m18",rumi:"Bismillahir Rahmanir Rahim. (1) Qul Huwallahu Ahad. (2) Allahus Samad. (3) Lam Yalid Wa Lam Yulad. (4) Wa Lam Yakul Lahu Kufuwan Ahad.",num:18,tajuk:"Surah Al-Ikhlas: 1-4",kali:"",quran:true,img:"./quran-img/Al-Ikhlas.jpg",maksud:"Katakanlah (wahai Muhammad): \"(Tuhanku) ialah Allah Yang Maha Esa; Allah Yang menjadi tumpuan sekalian makhluk untuk memohon sebarang hajat; Ia tiada beranak dan Ia pula tidak diperanakan; Dan tidak ada sesiapa pun yang setara dengan-Nya\"."},
+  {id:"m19",rumi:"Bismillahir Rahmanir Rahim. (1) Qul Auzu Birabbil Falaq. (2) Min Syarri Ma Khalaq. (3) Wa Min Syarri Ghasiqin Iza Waqab. (4) Wa Min Syarrin Naffasati Fil Uqad. (5) Wa Min Syarri Hasidin Iza Hasad.",num:19,tajuk:"Surah Al-Falaq: 1-5",kali:"",quran:true,img:"./quran-img/Al-Falaq.jpg",maksud:"Katakanlah (wahai Muhammad): \"Aku berlindung kepada (Allah) Tuhan yang menciptakan sekalian makhluk, Dari bencana makhluk-makhluk yang Ia ciptakan; Dan dari bahaya gelap apabila ia masuk; Dari bencana makhluk-makhluk yang menghembus-hembus pada simpulan-simpulan (dan ikatan-ikatan); Dan dari kejahatan orang yang dengki apabila ia melakukan dengkinya\"."},
+  {id:"m20",rumi:"Bismillahir Rahmanir Rahim. (1) Qul Auzu Birabbin Nas. (2) Malikin Nas. (3) Ilahin Nas. (4) Min Syarril Waswasil Khannas. (5) Allazi Yuwaswisu Fi Sudurin Nas. (6) Minal Jinnati Wan Nas.",num:20,tajuk:"Surah An-Naas: 1-6",kali:"",quran:true,img:"./quran-img/An-Naas.jpg",maksud:"Katakanlah (wahai Muhammad): Aku berlindung kepada (Allah) Pemelihara sekalian manusia. Yang Menguasai sekalian manusia, Tuhan yang berhak disembah oleh sekalian manusia, Dari kejahatan pembisik, penghasut yang timbul tenggelam, Yang melemparkan bisikan dan hasutannya ke dalam hati manusia, (Iaitu pembisik dan penghasut) dari kalangan jin dan manusia\"."},
+  {id:"m21",num:21,tajuk:"Doa Pujian Kepada Allah SWT",kali:"3x",arab_unicode:"أَصْبَحْنَا وَأَصْبَحَ (أَمْسَيْنَا وَأَمْسَى) الْمُلْكُ لِلهِ وَالْحَمْدُ لِلهِ لَا شَرِيكَ لَهُ لَا إِلَهَ إِلَّا هُوَ وَإِلَيْهِ النُّشُورُ (الْمَصِيرُ)",rumi:"Asbahnaa wa asbahal-mulku lillah (Amsainaa wa amsa), wal-hamdu lillah, laa syariika lah, laa ilaaha illaa huwa wa ilaihin-nusyuur (al-masiir).",maksud:"Sesungguhnya kami terjaga di pagi hari (di petang hari) dengan (kesedaran bahawa) Kerajaan (bumi dan segala isinya) ini seluruhnya adalah milik Allah. Dan segala puji bagi Allah, tiada sekutu bagi-Nya tiada Tuhan selain Dia dan kepada-Nya kami akan dibangkitkan."},
+  {id:"m22",num:22,tajuk:"Doa Teguh Pendirian Dalam Islam",kali:"",arab_unicode:"أَصْبَحْنَا (أَمْسَيْنَا) عَلَى فِطْرَةِ الْإِسْلَامِ وَكَلِمَةِ الْإِخْلَاصِ وَعَلَى دِينِ نَبِيِّنَا مُحَمَّدٍ صَلَّى اللهُ عَلَيْهِ وَسَلَّمَ وَعَلَى مِلَّةِ أَبِينَا إِبْرَاهِيمَ حَنِيفًا وَمَا كَانَ مِنَ الْمُشْرِكِينَ",rumi:"Asbahnaa (Amsainaa) 'alaa fitratil-Islaam, wa kalimatil-ikhlaas, wa 'alaa diini nabiyyinaa Muhammadin sallallaahu 'alaihi wasallam, wa 'alaa millati abiinaa Ibraahiima haniifaw wa maa kaana minal-musyrikiin.",maksud:"Kami terjaga di pagi hari (petang hari) dalam fitrah Islam, dan kalimah ikhlas dan dalam agama nabi kami, Muhammad SAW, dan dalam millah (ajaran) bapa kami Ibrahim yang hanif (lurus) sedang dia bukan orang musyrik."},
+  {id:"m23",num:23,tajuk:"Doa Mensyukuri Nikmat",kali:"3x",arab_unicode:"اَللَّهُمَّ إِنِّي أَصْبَحْتُ (أَمْسَيْتُ) مِنْكَ فِي نِعْمَةٍ وَعَافِيَةٍ وَسِتْرٍ فَأَتِمَّ عَلَيَّ نِعْمَتَكَ وَعَافِيَتَكَ وَسِتْرَكَ فِي الدُّنْيَا وَالْآخِرَةِ",rumi:"Allaahumma innii asbahtu (amsaitu) minka fii ni'matiw wa 'aafiyatiw wa sitr, fa-atimma 'alayya ni'mataka wa 'aafiyataka wa sitraka fid-dunyaa wal-aakhirah.",maksud:"Ya Allah, aku terjaga pada pagi dan petang dalam nikmat Mu, afiat (keselamatan dari mara bencana), dan terjaganya rahsia-rahsia (dosa-dosa) ku, maka sempurnakan nikmat-Mu, afiat-Mu dan penjagaan-Mu itu di atasku, di dunia dan akhirat."},
+  {id:"m24",num:24,tajuk:"Pengakuan Segala Nikmat Dari Allah",kali:"",arab_unicode:"اَللَّهُمَّ مَا أَصْبَحَ (أَمْسَى) بِي مِنْ نِعْمَةٍ أَوْ بِأَحَدٍ مِنْ خَلْقِكَ فَمِنْكَ وَحْدَكَ لَا شَرِيكَ لَكَ فَلَكَ الْحَمْدُ وَلَكَ الشُّكْرُ",rumi:"Allaahumma maa asbaha (amsaa) bii min ni'matin au bi-ahadin min khalqika faminka wahdaka laa syariika lak, falakal-hamdu wa lakasy-syukr.",maksud:"Ya Allah, tidaklah aku pada waktu pagi dan petang dengan nikmat apa yang aku peroleh dan diperoleh seseorang di antara makhluk-Mu adalah dari-Mu, yang Esa dan tidak bersekutu, maka bagi-Mu segala puji dan syukur."},
+  {id:"m25",num:25,tajuk:"Pujian Bagi Allah",kali:"",arab_unicode:"يَا رَبِّ لَكَ الْحَمْدُ كَمَا يَنْبَغِي لِجَلَالِ وَجْهِكَ وَعَظِيمِ سُلْطَانِكَ",rumi:"Yaa Rabbi lakal-hamdu kamaa yanbaghii lijalaali wajhika wa 'azhiimi sultaanik.",maksud:"Ya Allah, bagi-Mu segala puji seagung kemuliaan wajah-Mu dan kebesaran kekuasaan-Mu."},
+  {id:"m26",num:26,tajuk:"Ikrar",kali:"3x",arab_unicode:"رَضِيتُ بِاللهِ رَبًّا وَبِالْإِسْلَامِ دِينًا وَبِمُحَمَّدٍ نَبِيًّا وَرَسُولًا",rumi:"Radhiitu billaahi Rabbaa, wa bil-Islaami diinaa, wa bi-Muhammadin nabiyyaw wa rasuulaa.",maksud:"Aku telah redha dengan Allah sebagai Tuhanku, dan dengan Islam sebagai agamaku dan dengan Muhammad sebagai nabi dan rasulku."},
+  {id:"m27",num:27,tajuk:"Bertasbih Kepada Allah",kali:"3x",arab_unicode:"سُبْحَانَ اللهِ وَبِحَمْدِهِ عَدَدَ خَلْقِهِ وَرِضَا نَفْسِهِ وَزِنَةَ عَرْشِهِ وَمِدَادَ كَلِمَاتِهِ",rumi:"Subhaanallaahi wa bihamdihi 'adada khalqih, wa ridhaa nafsih, wa zinata 'arsyih, wa midaada kalimaatih.",maksud:"Maha suci Allah dan segala puji bagi-Nya sebanyak bilangan kejadian-Nya dan keredhaan-Nya, dan seberat timbangan 'arasy-Nya dan sebanyak dakwat (yang terpakai untuk menuliskan) kalimah-Nya."},
+  {id:"m28",num:28,tajuk:"Meninggikan Asma' Allah",kali:"3x",arab_unicode:"بِسْمِ اللهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ",rumi:"Bismillaahil-lazii laa yadhurru ma'asmihi syai'un fil-ardhi wa laa fis-samaa', wa huwas-samii'ul-'aliim.",maksud:"Dengan nama Allah, yang dengan nama-Nya akan terhalanglah, segala sesuatu di bumi dan di langit, untuk menimpakan bencana, dan Ia Maha Mendengar dan Mengetahui."},
+  {id:"m29",num:29,tajuk:"Doa Terhindar Dari Syirik",kali:"3x",arab_unicode:"اَللَّهُمَّ إِنَّا نَعُوذُ بِكَ مِنْ أَنْ نُشْرِكَ بِكَ شَيْئًا نَعْلَمُهُ وَنَسْتَغْفِرُكَ لِمَا لَا نَعْلَمُهُ",rumi:"Allaahumma innaa na'uuzu bika min an nusyrika bika syai'an na'lamuh, wa nastaghfiruka limaa laa na'lamuh.",maksud:"Ya Allah, kami berlindung pada-Mu dari menyekutukan-Mu dengan sesuatu yang kami ketahui, dan kami memohon ampun dari (menyekutukan-Mu) dengan sesuatu yang tidak kami ketahui."},
+  {id:"m30",num:30,tajuk:"Berlindung Dari Kejahatan Makhluk",kali:"3x",arab_unicode:"أَعُوذُ بِكَلِمَاتِ اللهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ",rumi:"A'uuzu bikalimaatillaahit-taammaati min syarri maa khalaq.",maksud:"Aku berlindung pada kalimat Allah yang sempurna, dari kejahatan apa-apa yang diciptakan."},
+  {id:"m31",num:31,tajuk:"Doa Terhindar Dari Belenggu Hutang",kali:"3x",arab_unicode:"اَللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ وَأَعُوذُ بِكَ مِنَ الْعَجْزِ وَالْكَسَلِ وَأَعُوذُ بِكَ مِنَ الْجُبْنِ وَالْبُخْلِ وَأَعُوذُ بِكَ مِنْ غَلَبَةِ الدَّيْنِ وَقَهْرِ الرِّجَالِ",rumi:"Allaahumma innii a'uuzu bika minal-hammi wal-hazan, wa a'uuzu bika minal-'ajzi wal-kasal, wa a'uuzu bika minal-jubni wal-bukhl, wa a'uuzu bika min ghalabatid-daini wa qahrir-rijaal.",maksud:"Ya Allah, aku berlindung pada-Mu dari rasa sedih dan gelisah, dan aku berlindung pada-Mu dari sikap pengecut dan bakhil, dan aku berlindung pada-Mu dari cengkaman hutang dan penindasan orang."},
+  {id:"m32",num:32,tajuk:"Doa Dilimpahkan Kesihatan",kali:"",arab_unicode:"اَللَّهُمَّ عَافِنِي فِي بَدَنِي اَللَّهُمَّ عَافِنِي فِي سَمْعِي اَللَّهُمَّ عَافِنِي فِي بَصَرِي",rumi:"Allaahumma 'aafinii fii badanii, Allaahumma 'aafinii fii sam'ii, Allaahumma 'aafinii fii basharii.",maksud:"Ya Allah, sihatkanlah badanku, Ya Allah, sihatkanlah pendengaranku, Ya Allah, sihatkanlah penglihatanku."},
+  {id:"m33",num:33,tajuk:"Doa Terhindar Dari Kemiskinan",kali:"3x",arab_unicode:"اَللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْكُفْرِ وَالْفَقْرِ اَللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ عَذَابِ الْقَبْرِ لَا إِلَهَ إِلَّا أَنْتَ",rumi:"Allaahumma innii a'uuzu bika minal-kufri wal-faqr, Allaahumma innii a'uuzu bika min 'azaabil-qabr, laa ilaaha illaa anta.",maksud:"Ya Allah, sesungguhnya aku berlindung pada-Mu dari kekafiran dan kefakiran; Ya Allah, aku berlindung kepada-Mu dari azab kubur; tidak ada Tuhan selain Engkau. (Ibnu Sunni, H. Sahih)"},
+  {id:"m34",num:34,tajuk:"Doa Memohon Keampunan (Sayyidul Istighfar)",kali:"3x",arab_unicode:"اَللَّهُمَّ أَنْتَ رَبِّي لَا إِلَهَ إِلَّا أَنْتَ خَلَقْتَنِي وَأَنَا عَبْدُكَ وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ وَأَبُوءُ بِذَنْبِي فَاغْفِرْ لِي فَإِنَّهُ لَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ",rumi:"Allaahumma anta Rabbii laa ilaaha illaa anta, khalaqtanii wa anaa 'abduka wa anaa 'alaa 'ahdika wa wa'dika mas-tatha'tu, a'uuzu bika min syarri maa shana'tu, abuu-u laka bini'matika 'alayya wa abuu-u bizanbii faghfir lii fa-innahu laa yaghfiruz-zunuuba illaa anta.",maksud:"Ya Allah, Engkau adalah Tuhanku, tidak ada Tuhan selain Engkau; Engkau yang menciptakan dan aku abdi-Mu, dan aku berada dalam perjanjian dengan-Mu, ikrar kepada-Mu, (yang akan aku laksanakan dengan) segala kemampuanku; dan aku berlindung pada-Mu, dari kejahatan apa-apa yang telah aku lakukan; aku mengakui (dengan sebenar-benarnya) nikmat-Mu kepadaku; dan aku mengakui dosaku, maka ampunilah aku, kerana tidak ada yang boleh mengampuni dosa-dosa, kecuali Engkau."},
+  {id:"m35",num:35,tajuk:"Istighfar - Mohon Keampunan",kali:"3x",arab_unicode:"أَسْتَغْفِرُ اللهَ الَّذِي لَا إِلَهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ وَأَتُوبُ إِلَيْهِ",rumi:"Astaghfirullaahal-lazii laa ilaaha illaa huwal-hayyul-qayyuum, wa atuubu ilaih.",maksud:"Aku memohon ampun kepada Allah yang tidak ada Tuhan selain Dia, yang hidup dan selalu jaga; dan aku bertaubat pada-Mu."},
+  {id:"m36",num:36,tajuk:"Selawat Atas Nabi Muhammad SAW",kali:"",arab_unicode:"اَللَّهُمَّ صَلِّ عَلَى سَيِّدِنَا مُحَمَّدٍ وَعَلَى آلِ سَيِّدِنَا مُحَمَّدٍ كَمَا صَلَّيْتَ عَلَى سَيِّدِنَا إِبْرَاهِيمَ وَعَلَى آلِ سَيِّدِنَا إِبْرَاهِيمَ وَبَارِكْ عَلَى سَيِّدِنَا مُحَمَّدٍ وَعَلَى آلِ سَيِّدِنَا مُحَمَّدٍ كَمَا بَارَكْتَ عَلَى سَيِّدِنَا إِبْرَاهِيمَ وَعَلَى آلِ سَيِّدِنَا إِبْرَاهِيمَ فِي الْعَالَمِينَ إِنَّكَ حَمِيدٌ مَجِيدٌ",rumi:"Allaahumma salli 'alaa sayyidinaa Muhammad, wa 'alaa aali sayyidinaa Muhammad, kamaa sallaita 'alaa sayyidinaa Ibraahiim, wa 'alaa aali sayyidinaa Ibraahiim, wa baarik 'alaa sayyidinaa Muhammad, wa 'alaa aali sayyidinaa Muhammad, kamaa baarakta 'alaa sayyidinaa Ibraahiim, wa 'alaa aali sayyidinaa Ibraahiim, fil-'aalamiina innaka Hamiidum Majiid.",maksud:"Ya Allah, limpahkan selawat (berkat dan rahmat) dan salam atas junjungan kami, Muhammad, dan di atas keluarga junjungan kami, Muhammad, seperti Engkau limpahkan selawat (berkat dan rahmat) atas junjungan kami, dan keluarga junjungan kami, Ibrahim; dan berkatilah junjungan kami, Muhammad, seperti Engkau berkati junjungan kami, Ibrahim, di alam ini sesungguhnya Engkaulah yang Maha Terpuji dan Mulia."},
+  {id:"m37",num:37,tajuk:"Segala Pujian Bagi Allah",kali:"100x",arab_unicode:"سُبْحَانَ اللهِ وَالْحَمْدُ لِلهِ وَلَا إِلَهَ إِلَّا اللهُ وَاللهُ أَكْبَرُ",rumi:"Subhaanallaahi wal-hamdu lillaahi wa laa ilaaha illallaahu wallaahu akbar.",maksud:"Maha Suci Allah, dan segala puji bagi Allah, dan tidak ada Tuhan selain Allah, dan Allah Maha Besar."},
+  {id:"m38",num:38,tajuk:"Keesaan Allah",kali:"",arab_unicode:"لَا إِلَهَ إِلَّا اللهُ وَحْدَهُ لَا شَرِيكَ لَهُ لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",rumi:"Laa ilaaha illallaahu wahdahu laa syariika lah, lahul-mulku wa lahul-hamdu wa huwa 'alaa kulli syai'in qadiir.",maksud:"Tidak ada Tuhan selain Allah, Yang Maha Esa, tidak ada sekutu bagi-Nya, yang memiliki segala kerajaan/kekuasaan dan segala pujian hanya bagi-Nya, dan Dia berkuasa atas setiap sesuatu. (Riwayat Muslim)"},
+  {id:"m39",num:39,tajuk:"Pujian Dan Mohon Taubat",kali:"",arab_unicode:"سُبْحَانَكَ اللَّهُمَّ وَبِحَمْدِكَ أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا أَنْتَ أَسْتَغْفِرُكَ وَأَتُوبُ إِلَيْكَ",rumi:"Subhaanakallaahumma wa bihamdika asyhadu an laa ilaaha illaa anta astaghfiruka wa atuubu ilaik.",maksud:"Maha Suci Engkau, Ya Allah dan segala pujian bagi-Mu; aku bersaksi bahawa tiada Tuhan selain Allah, aku mohon ampun dan bertaubat pada-Mu."},
+  {id:"m40",num:40,tajuk:"Selawat Ke Atas Nabi",kali:"",arab_unicode:"اَللَّهُمَّ صَلِّ عَلَى سَيِّدِنَا مُحَمَّدٍ عَبْدِكَ وَنَبِيِّكَ وَرَسُولِكَ النَّبِيِّ الْأُمِّيِّ وَعَلَى آلِهِ وَصَحْبِهِ وَسَلِّمْ تَسْلِيمًا عَدَدَ مَا أَحَاطَ بِهِ عِلْمُكَ وَخَطَّ بِهِ قَلَمُكَ وَأَحْصَاهُ كِتَابُكَ وَأَرْضَ اللَّهُمَّ عَنْ سَادَاتِنَا أَبِي بَكْرٍ وَعُمَرَ وَعُثْمَانَ وَعَلِيٍّ وَعَنِ الصَّحَابَةِ أَجْمَعِينَ وَعَنِ التَّابِعِينَ وَتَابِعِيهِمْ بِإِحْسَانٍ إِلَى يَوْمِ الدِّينِ سُبْحَانَ رَبِّكَ رَبِّ الْعِزَّةِ عَمَّا يَصِفُونَ وَسَلَامٌ عَلَى الْمُرْسَلِينَ وَالْحَمْدُ لِلهِ رَبِّ الْعَالَمِينَ",rumi:"Allaahumma salli 'alaa sayyidinaa Muhammadin 'abdika wa nabiyyika wa rasuulikan-nabiyyil-ummiyyi wa 'alaa aalihi wa sahbihi wa sallim tasliiman 'adada maa ahaatha bihi 'ilmuka wa khatta bihi qalamuka wa ahsaahu kitaabuk. Wa-ardha Allaahumma 'an saadaatinaa Abii Bakrin wa 'Umara wa 'Uthmaana wa 'Aliyyin wa 'anis-sahaabati ajma'iin, wa 'anit-taabi'iina wa taabi'iihim bi-ihsaanin ilaa yaumid-diin. Subhaana Rabbika Rabbil-'izzati 'ammaa yasifuun, wa salaamun 'alal-mursaliin, wal-hamdu lillaahi Rabbil-'aalamiin.",maksud:"Ya Allah restui dan berkatkanlah junjungan kami Muhammad sebagai hamba, nabi dan rasul-Mu yang ummi. Berkatkan keluarga dan sahabat Baginda. Sejahterakanlah Baginda selama-lamanya. Sejahterakanlah Baginda selama-lamanya sebanyak-banyak bilangan dalam ilmu dan sebanyak-banyak perkara yang ditulis oleh Qalam-Mu dan sebanyak-banyak yang dirangkum oleh kitab-Mu. Terimalah dan relakanlah pemimpin terutama kami; Sayyidina Abu Bakar, Omar, Othman, Ali dan para sahabat Baginda semuanya, para tabi'in, dan orang-orang yang mengikut jejak langkah mereka sampai hari pembalasan. Terimalah (kepulangan) mereka dengan sebaik-baiknya. Maha Suci Tuhan (Mu) yang memiliki kebesaran dan kemuliaan dari sifat tercela. Salam sejahtera untuk para Rasul utusan, dan segala puji bagi Allah, Tuhan sekalian alam."},
+  {id:"m41",num:41,tajuk:"Doa Selepas Wirid Ma'thurat",kali:"",arab_unicode:"اَللَّهُمَّ إِنَّا نَسْأَلُكَ لِسَانًا رَطْبًا بِذِكْرِكَ وَقَلْبًا مُفْعَمًا بِشُكْرِكَ وَبَدَنًا هَيِّنًا لَيِّنًا بِطَاعَتِكَ اَللَّهُمَّ إِنَّا نَسْأَلُكَ إِيمَانًا كَامِلًا وَنَسْأَلُكَ قَلْبًا خَاشِعًا وَنَسْأَلُكَ عِلْمًا نَافِعًا وَنَسْأَلُكَ يَقِينًا صَادِقًا وَنَسْأَلُكَ دِينًا قَيِّمًا وَنَسْأَلُكَ الْعَافِيَةَ مِنْ كُلِّ بَلِيَّةٍ وَنَسْأَلُكَ تَمَامَ الْغِنَى عَنِ النَّاسِ وَهَبْ لَنَا حَقِيقَةَ الْإِيمَانِ بِكَ حَتَّى لَا نَخَافَ وَلَا نَرْجُوَ غَيْرَكَ وَلَا نَعْبُدَ شَيْئًا سِوَاكَ وَاجْعَلْ يَدَكَ مَبْسُوطَةً عَلَيْنَا وَعَلَى أَهْلِينَا وَأَوْلَادِنَا وَمَنْ مَعَنَا بِرَحْمَتِكَ وَلَا تَكِلْنَا إِلَى أَنْفُسِنَا طَرْفَةَ عَيْنٍ وَلَا أَقَلَّ مِنْ ذَلِكَ يَا نِعْمَ الْمُجِيبُ وَصَلَّى اللهُ عَلَى سَيِّدِنَا مُحَمَّدٍ النَّبِيِّ الْكَرِيمِ وَعَلَى آلِهِ وَصَحْبِهِ أَجْمَعِينَ",rumi:"Allaahumma innaa nas-aluka lisaanan ratban bizikrik, wa qalban muf'aman bisyukrik, wa badanan hayyinan layyinan bitaa'atik. Allaahumma innaa nas-aluka iimaanan kaamilaa, wa nas-aluka qalban khaasyi'aa, wa nas-aluka 'ilman naafi'aa, wa nas-aluka yaqiinan saadiqaa, wa nas-aluka diinan qayyimaa, wa nas-alukal-'aafiyata min kulli baliyyah, wa nas-aluka tamaamal-ghinaa 'anin-naas. Wa hab lanaa haqiiqatal-iimaani bika hattaa laa nakhaafa wa laa narjuwa ghairak, wa laa na'buda syai-an siwaak. Waj'al yadaka mabsuuthatan 'alainaa wa 'alaa ahliinaa wa aulaadinaa wa man ma'anaa birahmatik, wa laa takilnaa ilaa anfusinaa tarfata 'ainin wa laa aqalla min zaalik, yaa ni'mal-mujiib. Wa sallallaahu 'alaa sayyidinaa Muhammadin-nabiyyil-kariim, wa 'alaa aalihi wa sahbihi ajma'iin.",maksud:"Ya Allah kurniakanlah kami lisan (lidah) yang lembut membasahi mengingati dan menyebut (nama-Mu), hati yang penuh segar mensyukuri (nikmat-Mu), serta badan yang ringan menyempurnakan ketaatan kepada (perintah-Mu). Ya Allah, kurniakanlah kami iman yang sempurna, hati yang khusyuk, ilmu yang berguna, keyakinan yang benar-benar mantap, din (cara hidup) yang jitu dan unggul, selamat dari segala mara bahaya dan petaka. Kami mohon kepada-Mu Ya Allah kecukupan yang tidak perlu kami terpaksa meminta kepada orang lain. Berikanlah kami Ya Allah iman yang sebenarnya sehingga kami tidak menyekutukan-Mu. Berikanlah rahmat-Mu kepada kami, keluarga dan anak-anak kami serta sesiapa sahaja yang bersama-sama kami. Jangan (Ya Allah) Engkau biarkan nasib kami ditentukan oleh diri kami sendiri; walaupun hanya dalam sekelip mata atau lebih pendek dari masa itu. Wahai Tuhan yang paling mudah dan cepat memperkenankan permintaan. Selawat (berkat dan rahmat) dan restu Allah untuk junjungan kami Muhammad, nabi yang mulia, kepada keluarga Baginda dan para sahabat Baginda amnya."},
+  {id:"m42",rumi:"(26) Qulillahumma Malikal Mulki Tu'til Mulka Man Tasya'u Wa Tanzi'ul Mulka Mimman Tasya', Wa Tu'izzu Man Tasya'u Wa Tuzillu Man Tasya', Biyadikal Khayr, Innaka Ala Kulli Syai'in Qadir. (27) Tulijul Layla Fin Nahari Wa Tulijun Nahara Fil Layl, Wa Tukhrijul Hayya Minal Mayyiti Wa Tukhrijul Mayyita Minal Hayy, Wa Tarzuqu Man Tasya'u Bighayri Hisab.",num:42,tajuk:"Pengakuan Kepada Kekuasaan Allah (Ali 'Imran: 26-27)",kali:"",quran:true,img:"./quran-img/Ali Imran 26-27.jpg",maksud:"Katakanlah (wahai Muhammad): \"Wahai Tuhan yang mempunyai kuasa pemerintahan! Engkaulah yang memberi kuasa pemerintahan kepada sesiapa yang Engkau kehendaki dan Engkaulah yang mencabut kuasa pemerintahan dari sesiapa yang Engkau kehendaki. Engkaulah juga yang memuliakan sesiapa yang Engkau kehendaki, dan Engkaulah yang menghina sesiapa yang Engkau kehendaki. Dalam kekuasaan Engkaulah sahaja adanya segala kebaikan. Sesungguhnya Engkau Maha Kuasa atas tiap-tiap sesuatu. Engkaulah (wahai Tuhan) yang memasukkan waktu malam ke dalam waktu siang, dan Engkaulah yang memasukkan waktu siang ke dalam waktu malam. Engkaulah juga yang mengeluarkan sesuatu yang hidup dari benda yang mati, dan Engkaulah yang mengeluarkan benda yang mati dari sesuatu yang hidup. Engkau jualah yang memberi rezeki sesiapa yang Engkau kehendaki dengan tiada hitungan hisabnya.\""},
+  {id:"m43",num:43,tajuk:"Doa Rabitah",kali:"",arab_unicode:"اَللَّهُمَّ إِنَّ هَذَا إِقْبَالُ لَيْلِكَ وَإِدْبَارُ نَهَارِكَ وَأَصْوَاتُ دُعَاتِكَ فَاغْفِرْ لِي. اَللَّهُمَّ إِنَّكَ تَعْلَمُ أَنَّ هَذِهِ الْقُلُوبَ قَدِ اجْتَمَعَتْ عَلَى مَحَبَّتِكَ وَالْتَقَتْ عَلَى طَاعَتِكَ وَتَوَحَّدَتْ عَلَى دَعْوَتِكَ وَتَعَاهَدَتْ عَلَى نُصْرَةِ شَرِيعَتِكَ فَوَثِّقِ اللَّهُمَّ رَابِطَتَهَا وَأَدِمْ وُدَّهَا وَاهْدِهَا سُبُلَهَا وَامْلَأْهَا بِنُورِكَ الَّذِي لَا يَخْبُو وَاشْرَحْ صُدُورَهَا بِفَيْضِ الْإِيمَانِ بِكَ وَجَمِيلِ التَّوَكُّلِ عَلَيْكَ وَأَحْيِهَا بِمَعْرِفَتِكَ وَأَمِتْهَا عَلَى الشَّهَادَةِ فِي سَبِيلِكَ إِنَّكَ نِعْمَ الْمَوْلَى وَنِعْمَ النَّصِيرُ وَصَلَّى اللهُ عَلَى سَيِّدِنَا مُحَمَّدٍ وَعَلَى آلِهِ وَصَحْبِهِ وَسَلَّمَ آمِينَ وَالْحَمْدُ لِلهِ رَبِّ الْعَالَمِينَ",rumi:"Allaahumma inna haazaa iqbaalu lailik, wa idbaaru nahaarik, wa aswaatu du'aatik, faghfir lii. Allaahumma innaka ta'lamu anna haazihil-quluuba qadij-tama'at 'alaa mahabbatik, wal-taqat 'alaa thaa'atik, wa tawahhadat 'alaa da'watik, wa ta'aahadat 'alaa nusrati syarii'atik, fa-wassiqil-laahumma raabithatahaa, wa adim wuddahaa, wahdihaa subulahaa, wamla'haa binuurikal-lazii laa yakhbuu, wasyrah suduurahaa bifaidhil-iimaani bik, wa jamiilit-tawakkuli 'alaik, wa ahyihaa bima'rifatik, wa amit-haa 'alasy-syahaadati fii sabiilik, innaka ni'mal-maulaa wa ni'man-nasiir. Wa sallallaahu 'alaa sayyidinaa Muhammadin wa 'alaa aalihi wa sahbihi wa sallama, aamiin, wal-hamdu lillaahi Rabbil-'aalamiin.",maksud:"Ya Allah, menjelanglah malam (ciptaan-Mu), beredarlah waktu siang kepada-Mu, inilah keluhan suara yang berdoa kepada-Mu, oleh itu ampunkanlah dosaku. Ya Allah Engkau mengetahui bahawa hati-hati ini (orang yang telah dibayangkan tadi) telah berkumpul kerana mengasihi-Mu, bertemu untuk mematuhi (perintah-Mu), bersatu memikul beban dakwah-Mu, hati-hati ini telah mengikat janji setia untuk mendaulat dan menyokong syariat-Mu, maka eratkanlah Ya Allah akan ikatannya. Kekalkan kemesraan antara hati-hati ini akan jalan-Nya (yang sebenar). Penuhkan (piala) hati ini dengan cahaya Rabbani-Mu yang tidak kunjung malap. Lapangkanlah hati-hati ini dengan limpahan iman/keyakinan dan keindahan tawakkal kepada-Mu. Hidup suburkan hati-hati ini dengan ma'rifat (pengetahuan sebenar) tentang-Mu. (Jika Engkau mentakdirkan mati) maka matikanlah pemilik hati-hati ini sebagai para syuhada dalam perjuangan agama-Mu. Engkaulah sebaik-baik Sandaran dan sebaik-baik Penolong. Ya Allah, restuilah dan sejahterakanlah junjungan kami Muhammad, keluarga dan para sahabat Baginda semuanya, Ya Allah perkenankanlah doa ini (Amin) dan segala puji bagi Allah Tuhan sekalian alam."}
+];
+const MATHURAT_AUDIO={
+  m01:"Taawwuz.mp3",
+  m02:"Al-Fatihah.mp3",
+  m03:"Al-Baqarah 1-5.mp3",
+  m04:"Ayat Kursi.mp3",
+  m05:"Al-Baqarah 256-257.mp3",
+  m06:"Al-Baqarah 284-286.mp3",
+  m07:"Surah Taha 1-2.mp3",
+  m08:"Surah Taha 111-112.mp3",
+  m09:"At-Taubah 129.mp3",
+  m10:"Al-Israa 110-111.mp3",
+  m11:"Al-Mukminun 115-118.mp3",
+  m12:"Ar-Rum 17-26.mp3",
+  m13:"Al-Mukmin 1-3.mp3",
+  m14:"Al-Hasyr 22-24.mp3",
+  m15:"Az-Zalzalah.mp3",
+  m16:"Al-Kafirun.mp3",
+  m17:"An-Nasr.mp3",
+  m18:"Al-Ikhlas.mp3",
+  m19:"Al-Falaq.mp3",
+  m20:"An-Naas.mp3",
+  m21:"Doa Pujian Kepada Allah.mp3",
+  m22:"Doa Teguh Pendirian Dalam Islam.mp3",
+  m23:"Doa Mensyukuri Nikmat.mp3",
+  m24:"Pengakuan Segala Nikmat Dari Allah.mp3",
+  m25:"Pujian Bagi Allah.mp3",
+  m26:"Ikrar.mp3",
+  m27:"Bertasbih Kepada Allah.mp3",
+  m28:"Meninggikan Asma Allah.mp3",
+  m29:"Doa Terhindar Dari Syirik.mp3",
+  m30:"Berlindung Dari Kejahatan Makhluk.mp3",
+  m31:"Doa Terhindar Dari Belenggu Hutang.mp3",
+  m32:"Doa Dilimpahkan Kesihatan.mp3",
+  m33:"Doa Terhindar Dari Kemiskinan.mp3",
+  m34:"Sayyidul Istighfar.mp3",
+  m35:"Istighfar Mohon Keampunan.mp3",
+  m36:"Selawat Atas Nabi Muhammad SAW.mp3",
+  m37:"Segala Pujian Bagi Allah.mp3",
+  m38:"Keesaan Allah.mp3",
+  m39:"Pujian Dan Mohon Taubat.mp3",
+  m40:"Selawat Ke Atas Nabi.mp3",
+  m41:"Doa Selepas Wirid Mathurat.mp3",
+  m42:"Ali Imran 26-27.mp3",
+  m43:"Doa Rabitah.mp3"
+};
+const TITLES={solat:'Doa dalam Solat',wirid:'Wirid & Zikir Selepas Solat (Biasa)',wpendek:'Wirid & Zikir Selepas Solat (Pendek)',wpanjang:'Wirid & Zikir Selepas Solat (Panjang)',harian:'Doa-Doa Harian',mathurat:"Al-Ma'thurat"};
+
+/* ===================================================================
+   WIRID (PENDEK) & WIRID (PANJANG)
+   Kad yang dikongsi diambil terus daripada WIRID (sumber tunggal)
+   melalui _W(id) — jika teks dalam Biasa dibetulkan, Pendek/Panjang
+   akan turut dikemas kini secara automatik.
+   =================================================================== */
+const _W=id=>{const c=WIRID.find(x=>x.id===id);return c?JSON.parse(JSON.stringify(c)):{};};
+const _mk=(srcId,id,num,ov)=>Object.assign(_W(srcId),{id:id,num:String(num)},ov||{});
+
+const WIRID_PENDEK=[
+  _mk('w01','q01',1),
+  _mk('w02','q02',2),
+  _mk('w03','q03',3,{tajuk:"Doa Memohon Dijauhkan daripada Azab Neraka"}),
+  _mk('w04','q04',4),
+  _mk('w33','q05',5,{tajuk:"Selawat Syifa"}),
+  _mk('w18','q06',6,{tajuk:"Doa Penutup Wirid (Ta'awwuz, Bismillah dan Puji-pujian kepada Allah dalam doa)"}),
+  _mk('w19','q07',7,{tajuk:"Doa Penutup Wirid (Tahmid dalam doa)"}),
+  _mk('w20','q08',8,{tajuk:"Doa untuk Ibu Bapa"}),
+  _mk('w21','q09',9,{tajuk:"Doa Selamat Dunia dan Akhirat"}),
+  _mk('w24','q10',10,{tajuk:"Doa Memohon Keteguhan Hati di Atas Hidayah"}),
+  _mk('w28','q11',11,{tajuk:"Doa Sapu Jagat"}),
+  _mk('w29','q12',12),
+  _mk('w30','q13',13,{tajuk:"Tasbih Penutup Doa"})
+];
+
+const WIRID_PANJANG=[
+  _mk('w01','p01',1),
+  _mk('w02','p02',2),
+  _mk('w03','p03',3,{tajuk:"Doa Memohon Dijauhkan daripada Azab Neraka"}),
+  _mk('w04','p04',4),
+  _mk('w33','p05',5,{tajuk:"Selawat Syifa"}),
+  _mk('w05','p06',6),
+  _mk('w06','p07',7),
+  _mk('w06b','p08',8),
+  _mk('w07','p09',9,{tajuk:"Ayatul Kursi (Surah Al-Baqarah Ayat 255)"}),
+  {id:"p10",num:"10",tajuk:"Surah Al-Baqarah Ayat 284",kali:"1x",img:"./quran-img/Al-Baqarah 284.jpg",arab_unicode:"",rumi:"Lillaahi maa fis-samaawaati wa maa fil-ard. Wa in tubduu maa fii anfusikum au tukhfuuhu yuhaasibkum bihillaah. Fayaghfiru limay-yasyaa'u wa yu'azzibu may-yasyaa'. Wallaahu 'alaa kulli syai'in qadiir.",maksud:"Segala yang ada di langit dan yang ada di bumi adalah kepunyaan Allah. Dan jika kamu melahirkan apa yang ada di dalam hati kamu atau kamu menyembunyikannya, nescaya Allah akan menghitung dan menyatakannya kepada kamu. Kemudian Ia mengampunkan bagi sesiapa yang dikehendaki-Nya dan menyeksa sesiapa yang dikehendaki-Nya. Dan (ingatlah), Allah Maha Kuasa atas tiap-tiap sesuatu."},
+  {id:"p11",num:"11",tajuk:"Surah Al-Baqarah Ayat 285",kali:"1x",img:"./quran-img/Al-Baqarah 285.jpg",arab_unicode:"",rumi:"Aamanar-rasuulu bimaa unzila ilaihi mir-rabbihii wal-mu'minuun. Kullun aamana billaahi wa malaa'ikatihii wa kutubihii wa rusulih. Laa nufarriqu baina ahadim-mir-rusulih. Wa qaaluu sami'naa wa atha'naa, ghufraanaka rabbanaa wa ilaikal-mashiir.",maksud:"Rasulullah telah beriman kepada apa yang diturunkan kepadanya dari Tuhannya, dan juga orang-orang yang beriman; semuanya beriman kepada Allah, dan Malaikat-malaikat-Nya, dan Kitab-kitab-Nya, dan Rasul-rasul-Nya. (Mereka berkata): \"Kami tidak membezakan antara seorang dengan yang lain dari Rasul-rasul-Nya\". Mereka berkata lagi: \"Kami dengar dan kami taat. (Kami pohonkan) keampunan-Mu wahai Tuhan kami, dan kepada-Mu jualah tempat kembali\"."},
+  {id:"p12",num:"12",tajuk:"Surah Al-Baqarah Ayat 286",kali:"1x",img:"./quran-img/Al-Baqarah 286.jpg",arab_unicode:"",rumi:"Laa yukallifullaahu nafsan illaa wus'ahaa. Lahaa maa kasabat wa 'alaihaa mak-tasabat. Rabbanaa laa tu'aakhiznaa in-nasiinaa au akhtha'naa. Rabbanaa wa laa tahmil 'alainaa ishran kamaa hamaltahuu 'alal-laziina min qablinaa. Rabbanaa wa laa tuhammilnaa maa laa thaaqata lanaa bih. Wa'fu 'annaa, waghfir lanaa, warhamnaa. Anta maulaanaa fanshurnaa 'alal-qaumil-kaafiriin.",maksud:"Allah tidak memberati seseorang melainkan apa yang terdaya olehnya. Ia mendapat pahala kebaikan yang diusahakannya, dan ia juga menanggung dosa kejahatan yang diusahakannya. (Mereka berdoa dengan berkata): \"Wahai Tuhan kami! Janganlah Engkau mengirakan kami salah jika kami lupa atau kami tersalah. Wahai Tuhan kami! Janganlah Engkau bebankan kepada kami bebanan yang berat sebagaimana yang telah Engkau bebankan kepada orang-orang yang terdahulu daripada kami. Wahai Tuhan kami! Janganlah Engkau pikulkan kepada kami apa yang kami tidak terdaya memikulnya. Dan maafkanlah kesalahan kami, serta ampunkanlah dosa kami, dan berilah rahmat kepada kami. Engkaulah Penolong kami; oleh itu, tolonglah kami untuk mencapai kemenangan terhadap kaum-kaum yang kafir\"."},
+  {id:"p13",num:"13",tajuk:"Surah Ali 'Imran Ayat 18",kali:"1x",img:"./quran-img/Ali Imran 18.jpg",arab_unicode:"",rumi:"Syahidallaahu annahuu laa ilaaha illaa huwa wal-malaa'ikatu wa ulul-'ilmi qaa'imam bil-qisth. Laa ilaaha illaa huwal-'aziizul-hakiim.",maksud:"Allah menerangkan (kepada sekalian makhluk-Nya dengan dalil-dalil dan bukti), bahawasanya tiada Tuhan (yang berhak disembah) melainkan Dia, Yang sentiasa mentadbirkan (seluruh alam) dengan keadilan, dan malaikat-malaikat serta orang-orang yang berilmu (mengakui dan menegaskan juga yang demikian); tiada Tuhan (yang berhak disembah) melainkan Dia; Yang Maha Kuasa, lagi Maha Bijaksana."},
+  {id:"p14",num:"14",tajuk:"Surah Ali 'Imran Ayat 19",kali:"1x",img:"./quran-img/Ali Imran 19.jpg",arab_unicode:"",rumi:"Innad-diina 'indallaahil-Islaam. Wa makhtalafal-laziina uutul-kitaaba illaa mim ba'di maa jaa'ahumul-'ilmu baghyam bainahum. Wa may-yakfur bi'aayaatillaahi fa'innallaaha sarii'ul-hisaab.",maksud:"Sesungguhnya agama (yang benar dan diredai) di sisi Allah ialah Islam. Dan orang-orang (Yahudi dan Nasrani) yang diberikan Kitab itu tidak berselisih (mengenai agama Islam dan enggan menerimanya) melainkan setelah sampai kepada mereka pengetahuan yang sah tentang kebenarannya; (perselisihan itu pula) semata-mata kerana hasad dengki yang ada dalam kalangan mereka. Dan (ingatlah), sesiapa yang kufur ingkar akan ayat-ayat keterangan Allah, maka sesungguhnya Allah Amat segera hitungan hisab-Nya."},
+  {id:"p15",num:"15",tajuk:"Surah Ali 'Imran Ayat 26",kali:"1x",img:"./quran-img/Ali Imran 26.jpg",arab_unicode:"",rumi:"Qulillaahumma maalikal-mulki tu'til-mulka man tasyaa'u wa tanzi'ul-mulka mimman tasyaa', wa tu'izzu man tasyaa'u wa tuzillu man tasyaa'. Biyadikal-khair, innaka 'alaa kulli syai'in qadiir.",maksud:"Katakanlah (wahai Muhammad): \"Wahai Tuhan yang mempunyai kuasa pemerintahan! Engkaulah yang memberi kuasa pemerintahan kepada sesiapa yang Engkau kehendaki, dan Engkaulah yang mencabut kuasa pemerintahan dari sesiapa yang Engkau kehendaki. Engkaulah juga yang memuliakan sesiapa yang Engkau kehendaki, dan Engkaulah yang menghina sesiapa yang Engkau kehendaki. Dalam kekuasaan Engkaulah sahaja adanya segala kebaikan. Sesungguhnya Engkau Maha Kuasa atas tiap-tiap sesuatu\"."},
+  {id:"p16",num:"16",tajuk:"Surah Ali 'Imran Ayat 27",kali:"1x",img:"./quran-img/Ali Imran 27.jpg",arab_unicode:"",rumi:"Tuulijul-laila fin-nahaari wa tuulijun-nahaara fil-lail, wa tukhrijul-hayya minal-mayyiti wa tukhrijul-mayyita minal-hayy, wa tarzuqu man tasyaa'u bighairi hisaab.",maksud:"\"Engkaulah (wahai Tuhan) yang memasukkan waktu malam ke dalam waktu siang, dan Engkaulah yang memasukkan waktu siang ke dalam waktu malam. Engkaulah juga yang mengeluarkan sesuatu yang hidup dari benda yang mati, dan Engkaulah yang mengeluarkan benda yang mati dari sesuatu yang hidup. Engkau jualah yang memberi rezeki kepada sesiapa yang Engkau kehendaki, dengan tiada hitungan hisabnya\"."},
+  _mk('w08','p17',17),
+  _mk('w09','p18',18),
+  _mk('w10','p19',19),
+  _mk('w06','p20',20,{tajuk:"Surah Al-Fatihah (Dibaca Sekali Lagi)"}),
+  _mk('w11','p21',21),
+  _mk('w12','p22',22),
+  _mk('w13','p23',23),
+  _mk('w14','p24',24),
+  _mk('w15','p25',25),
+  _mk('w16','p26',26),
+  _mk('w17','p27',27),
+  _mk('w18','p28',28,{tajuk:"Doa Penutup Wirid (1/9 \u2013 Ta'awwuz, Bismillah dan Puji-pujian kepada Allah dalam doa)"}),
+  _mk('w19','p29',28,{tajuk:"Doa Penutup Wirid (2/9 \u2013 Tahmid dalam doa)"}),
+  _mk('w35','p30',28,{tajuk:"Doa Penutup Wirid (3/9 \u2013 Selawat Ibrahimiyyah)"}),
+  _mk('w20','p31',28,{tajuk:"Doa Penutup Wirid (4/9 \u2013 Doa untuk Ibu Bapa)"}),
+  _mk('w36','p32',28,{tajuk:"Doa Penutup Wirid (5/9 \u2013 Doa untuk Guru)"}),
+  _mk('w21','p33',28,{tajuk:"Doa Penutup Wirid (6/9 \u2013 Doa Selamat Dunia dan Akhirat)"}),
+  _mk('w22','p34',28,{tajuk:"Doa Penutup Wirid (7/9 \u2013 Doa Zikir, Syukur dan Ibadah yang Baik)"}),
+  _mk('w37','p35',28,{tajuk:"Doa Penutup Wirid (8/9 \u2013 Doa untuk Semua Muslimin dan Muslimat)"}),
+  _mk('w28','p36',28,{tajuk:"Doa Penutup Wirid (9/9 \u2013 Doa Sapu Jagat)"}),
+  _mk('w05','p37',29),
+  _mk('w06','p38',30),
+  _mk('w34','p39',31,{tajuk:"Surah Al-Ma'idah Ayat 114"}),
+  {id:"p40",num:"32",tajuk:"Selawat Rezeki",kali:"3x",img:"",rumi:"",maksud:"",reminder:true},
+  _mk('w32','p41',33,{tajuk:"Selawat Nurul Anwar"}),
+  {id:"p42",num:"34",tajuk:"Pembuka Doa Robbana",kali:"1x",img:"",arab_unicode:"اَلْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ، وَالصَّلَاةُ وَالسَّلَامُ عَلَى سَيِّدِنَا مُحَمَّدٍ أَشْرَفِ الْمُرْسَلِينَ، وَعَلَى آلِهِ وَصَحْبِهِ أَجْمَعِينَ",rumi:"Alhamdu Lillahi Rabbil 'Alamin, Was Salatu Was Salamu 'Ala Sayyidina Muhammadin Asyrafil Mursalin, Wa 'Ala Alihi Wa Sahbihi Ajma'in.",maksud:"Segala puji bagi Allah, Tuhan sekalian alam. Selawat dan salam ke atas junjungan kami Nabi Muhammad SAW, semulia-mulia para rasul, serta ke atas keluarga dan para sahabat baginda sekalian."},
+  {id:"p43",num:"35",tajuk:"Doa Memohon Penerimaan Amalan dan Taubat",kali:"1x",img:"",arab_unicode:"\u0627\u064e\u0644\u0644\u0651\u064e\u0647\u064f\u0645\u0651\u064e \u062a\u064e\u0642\u064e\u0628\u0651\u064e\u0644\u0652 \u0645\u0650\u0646\u0651\u064e\u0627 \u0635\u064e\u0644\u064e\u0627\u062a\u064e\u0646\u064e\u0627 \u0648\u064e\u062f\u064f\u0639\u064e\u0627\u0621\u064e\u0646\u064e\u0627 \u0625\u0650\u0646\u0651\u064e\u0643\u064e \u0623\u064e\u0646\u0652\u062a\u064e \u0627\u0644\u0633\u0651\u064e\u0645\u0650\u064a\u0639\u064f \u0627\u0644\u0652\u0639\u064e\u0644\u0650\u064a\u0645\u064f\u060c \u0648\u064e\u062a\u064f\u0628\u0652 \u0639\u064e\u0644\u064e\u064a\u0652\u0646\u064e\u0627 \u0625\u0650\u0646\u0651\u064e\u0643\u064e \u0623\u064e\u0646\u0652\u062a\u064e \u0627\u0644\u062a\u0651\u064e\u0648\u0651\u064e\u0627\u0628\u064f \u0627\u0644\u0631\u0651\u064e\u062d\u0650\u064a\u0645\u064f",rumi:"Allahumma Taqabbal Minna Salatana Wa Du'a'ana Innaka Antas Sami'ul 'Alim, Wa Tub 'Alayna Innaka Antat Tawwabur Rahim.",maksud:"Ya Allah, terimalah daripada kami solat kami dan doa kami, sesungguhnya Engkaulah Yang Maha Mendengar lagi Maha Mengetahui. Dan terimalah taubat kami, sesungguhnya Engkaulah Yang Maha Penerima Taubat lagi Maha Penyayang."},
+  {id:"p44",num:"36",tajuk:"Doa Rabbana (1/5 \u2013 Memohon Keteguhan Hati di Atas Hidayah)",kali:"1x",img:"",arab_unicode:"\u0627\u064e\u0644\u0644\u0651\u064e\u0647\u064f\u0645\u0651\u064e \u0627\u062e\u0652\u062a\u0650\u0645\u0652 \u0644\u064e\u0646\u064e\u0627 \u0628\u0650\u062d\u064f\u0633\u0652\u0646\u0650 \u0627\u0644\u0652\u062e\u064e\u0627\u062a\u0650\u0645\u064e\u0629\u0650\u060c \u0648\u064e\u0644\u064e\u0627 \u062a\u064e\u062e\u0652\u062a\u0650\u0645\u0652 \u0639\u064e\u0644\u064e\u064a\u0652\u0646\u064e\u0627 \u0628\u0650\u0633\u064f\u0648\u0621\u0650 \u0627\u0644\u0652\u062e\u064e\u0627\u062a\u0650\u0645\u064e\u0629\u0650\u060c \u0631\u064e\u0628\u0651\u064e\u0646\u064e\u0627 \u0644\u064e\u0627 \u062a\u064f\u0632\u0650\u063a\u0652 \u0642\u064f\u0644\u064f\u0648\u0628\u064e\u0646\u064e\u0627 \u0628\u064e\u0639\u0652\u062f\u064e \u0625\u0650\u0630\u0652 \u0647\u064e\u062f\u064e\u064a\u0652\u062a\u064e\u0646\u064e\u0627 \u0648\u064e\u0647\u064e\u0628\u0652 \u0644\u064e\u0646\u064e\u0627 \u0645\u0650\u0646\u0652 \u0644\u064e\u062f\u064f\u0646\u0652\u0643\u064e \u0631\u064e\u062d\u0652\u0645\u064e\u0629\u064b \u0625\u0650\u0646\u0651\u064e\u0643\u064e \u0623\u064e\u0646\u0652\u062a\u064e \u0627\u0644\u0652\u0648\u064e\u0647\u0651\u064e\u0627\u0628\u064f",rumi:"Allahummakhtim Lana Bihusnil Khatimah, Wa La Takhtim 'Alayna Bisu'il Khatimah, Rabbana La Tuzigh Qulubana Ba'da Iz Hadaytana Wa Hab Lana Min Ladunka Rahmatan Innaka Antal Wahhab.",maksud:"Ya Allah, akhirilah hidup kami dengan pengakhiran yang baik (husnul khatimah), dan janganlah Engkau akhiri hidup kami dengan pengakhiran yang buruk. Wahai Tuhan kami, janganlah Engkau condongkan hati kami kepada kesesatan setelah Engkau berikan petunjuk kepada kami, dan kurniakanlah kepada kami rahmat dari sisi-Mu, sesungguhnya Engkaulah Maha Pemberi."},
+  _mk('w23','p45',36,{tajuk:"Doa Rabbana (2/5 \u2013 Memohon Keampunan dan Rahmat Allah)"}),
+  _mk('w25','p47',36,{tajuk:"Doa Rabbana (3/5 \u2013 Memohon Keampunan atas Kelalaian dan Kesilapan)"}),
+  _mk('w26','p48',36,{tajuk:"Doa Rabbana (4/5 \u2013 Memohon Keringanan Beban, Keampunan dan Pertolongan Allah)"}),
+  _mk('w27','p49',36,{tajuk:"Doa Rabbana (5/5 \u2013 Memohon Keluarga yang Soleh dan Penyejuk Hati)"}),
+  _mk('w29','p50',37),
+  _mk('w30','p51',38)
+];
+
+/* ===== Nama fail audio bagi setiap kad Wirid (Panjang) =====
+   Fail sedia ada dalam ./audio/ digunakan semula.
+   Fail BARU yang perlu ditambah: Al-Baqarah 284/285/286, Ali Imran 18/19/26/27,
+   Pembuka Doa Robbana, Doa 1, Doa 2. */
+const PANJANG_AUDIO={
+  p01:"Istighfar.mp3",
+  p02:"Pengakuan Tauhid.mp3",
+  p03:"Dijauhkan Azab Neraka.mp3",
+  p04:"Zikir Memohon Keselamatan.mp3",
+  p05:"Selawat Shifa.mp3",
+  p06:"Taawwuz.mp3",
+  p07:"Al-Fatihah.mp3",
+  p08:"Al-Baqarah 163.mp3",
+  p09:"Ayat Kursi.mp3",
+  p10:"Al-Baqarah 284.mp3",
+  p11:"Al-Baqarah 285.mp3",
+  p12:"Al-Baqarah 286.mp3",
+  p13:"Ali Imran 18.mp3",
+  p14:"Ali Imran 19.mp3",
+  p15:"Ali Imran 26.mp3",
+  p16:"Ali Imran 27.mp3",
+  p17:"Al-Ikhlas.mp3",
+  p18:"Al-Falaq.mp3",
+  p19:"An-Naas.mp3",
+  p20:"Al-Fatihah.mp3",
+  p21:"Tasbih Pembuka.mp3",
+  p22:"Subhanallah.mp3",
+  p23:"Tahmid Pembuka.mp3",
+  p24:"Alhamdulillah.mp3",
+  p25:"Takbir Pembuka.mp3",
+  p26:"Allahu Akbar.mp3",
+  p27:"Pelengkap Tasbih Tahmid Takbir.mp3",
+  p28:"Doa Penutup Wirid (Taawwuz, Bismillah dan Puji-pujian kepada Allah dalam doa).mp3",
+  p29:"Doa Penutup Wirid (Tahmid dlm doa).mp3",
+  p30:"Selawat Ibrahimiyyah.mp3",
+  p31:"Doa Penutup Wirid (Doa untuk Ibu Bapa).mp3",
+  p32:"Doa untuk Guru.mp3",
+  p33:"Doa Penutup Wirid (Doa Selamat Dunia dan Akhirat).mp3",
+  p34:"Doa Penutup Wirid (Doa Zikir, Syukur dan Ibadah yang Baik).mp3",
+  p35:"Doa utk Semua.mp3",
+  p36:"Doa Sapu Jagat.mp3",
+  p37:"Taawwuz.mp3",
+  p38:"Al-Fatihah.mp3",
+  p39:"Al-Maidah 114.mp3",
+  p41:"Selawat Nuril Anwar.mp3",
+  p42:"Pembuka Doa Robbana.mp3",
+  p43:"Doa Memohon Penerimaan Amalan dan Taubat.mp3",
+  p44:"Doa Husnul Khatimah dan Keteguhan Hati.mp3",
+  p45:"Doa Memohon Keampunan dan Rahmat Allah.mp3",
+  p47:"Doa Memohon Keampunan atas Kelalaian dan Kesilapan.mp3",
+  p48:"Doa Memohon Keringanan Beban, Keampunan dan Pertolongan Allah.mp3",
+  p49:"Doa Memohon Keluarga yang Soleh dan Penyejuk Hati.mp3",
+  p50:"Selawat Penutup Doa.mp3",
+  p51:"Penutup Wirid 6.mp3"
+};
+
+/* ===== Nama fail audio bagi setiap kad Wirid (Pendek) =====
+   Semua fail sudah wujud dalam ./audio/. */
+const PENDEK_AUDIO={
+  q01:"Istighfar.mp3",
+  q02:"Pengakuan Tauhid.mp3",
+  q03:"Dijauhkan Azab Neraka.mp3",
+  q04:"Zikir Memohon Keselamatan.mp3",
+  q05:"Selawat Shifa.mp3",
+  q06:"Doa Penutup Wirid (Taawwuz, Bismillah dan Puji-pujian kepada Allah dalam doa).mp3",
+  q07:"Doa Penutup Wirid (Tahmid dlm doa).mp3",
+  q08:"Doa Penutup Wirid (Doa untuk Ibu Bapa).mp3",
+  q09:"Doa Penutup Wirid (Doa Selamat Dunia dan Akhirat).mp3",
+  q10:"Doa Memohon Keteguhan Hati di Atas Hidayah.mp3",
+  q11:"Doa Sapu Jagat.mp3",
+  q12:"Selawat Penutup Doa.mp3",
+  q13:"Penutup Wirid 6.mp3"
+};
+
+/* ===== Nama fail audio bagi setiap kad Doa dalam Solat ===== */
+const SOLAT_AUDIO={
+  s1:"Doa Iftitah.mp3",
+  s2:"Al-Fatihah.mp3",
+  s3:"Doa Ketika Rukuk.mp3",
+  s4:"Doa Bangun Dari Rukuk.mp3",
+  s5:"Doa Ketika Sujud.mp3",
+  s6:"Doa Duduk Antara Dua Sujud.mp3",
+  s7:"Doa Duduk Tahiyat Awal.mp3",
+  s8:"Doa Duduk Tahiyat Akhir.mp3",
+  s9:"Doa Qunut.mp3",
+  s10:"Doa Qunut Nazilah.mp3"
+};
+
+function showView(id){
+  stopAudio();
+  ['v-landing','v-grid','v-card'].forEach(vid=>{
+    const v=document.getElementById(vid);
+    v.classList.remove('active');
+    if(vid!=='v-landing') v.classList.add('slide-up');
+  });
+  const el=document.getElementById(id);
+  el.classList.remove('slide-up');
+  el.classList.add('active');
+}
+
+function goLanding(){section=null;showView('v-landing');}
+
+function goBack(){
+  if(fromGrid) showView('v-grid');
+  else goLanding();
+}
+
+function openGrid(sec){
+  section=sec; cards=sec==='solat'?SOLAT:sec==='wirid'?WIRID:sec==='wpendek'?WIRID_PENDEK:sec==='wpanjang'?WIRID_PANJANG:sec==='mathurat'?MATHURAT:HARIAN; fromGrid=true;
+  const gh=document.getElementById('gridHeader');
+  const gt=document.getElementById('gridTitle');
+  const gs=document.getElementById('gridSub');
+  const gscroll=document.getElementById('gridScroll');
+  gh.className='grid-header '+sec;
+  gt.className='grid-title '+sec;
+  gt.textContent=TITLES[sec];
+  gs.textContent=cards.length+' kad';
+  gscroll.className='grid-scroll '+sec;
+  gscroll.innerHTML='';
+  cards.forEach((c,i)=>{
+    const div=document.createElement('div');
+    div.className='grid-card '+sec;
+    const step=sec==='solat'&&c.step?`<div class="gc-step ${sec}">${c.step}</div>`:'';
+    div.innerHTML=`<div class="gc-num">${i+1}</div><div class="gc-tajuk ${sec}">${c.tajuk}</div>${step}`;
+    div.onclick=()=>openCard(i);
+    gscroll.appendChild(div);
+  });
+  showView('v-grid');
+}
+
+function openDirect(sec){
+  section=sec; cards=sec==='solat'?SOLAT:sec==='harian'?HARIAN:sec==='mathurat'?MATHURAT:sec==='wpendek'?WIRID_PENDEK:sec==='wpanjang'?WIRID_PANJANG:WIRID; fromGrid=false; current=0;
+  setupCardView(sec,0); showView('v-card');
+}
+
+function openCard(idx){
+  current=idx; setupCardView(section,idx); showView('v-card');
+}
+
+function setupCardView(t,idx){
+  const ch=document.getElementById('cardHeader2');
+  const btnBack=document.getElementById('btnBack');
+  const ht=document.getElementById('hdrTitle');
+  const pb=document.getElementById('pbWrap');
+  const pf=document.getElementById('pbFill');
+  const nb=document.getElementById('navBar2');
+  const bp=document.getElementById('btnPrev');
+  const bn=document.getElementById('btnNext');
+  const nd=document.getElementById('navDots');
+  const ce=document.getElementById('cardEl');
+
+  ch.className='card-header2 '+t;
+  btnBack.textContent=fromGrid?'← Grid':'🏠';
+  ht.className='hdr-title '+t;
+  ht.textContent=TITLES[t];
+  pb.className='pb-wrap '+t;
+  pf.className='pb-fill '+t;
+  nb.className='nav-bar2 '+t;
+  ce.className='card '+t;
+  bp.className='nav-btn '+t;
+  bn.className='nav-btn '+t;
+
+  nd.innerHTML='';
+  cards.forEach((_,i)=>{
+    const d=document.createElement('div');
+    let cls='dot '+t;
+    if(i===idx) cls+=' active';
+    if(t==='wirid'&&i>=WIRID_BONUS) cls+=' bonus-dot';
+    d.className=cls;
+    d.onclick=()=>goTo(i);
+    nd.appendChild(d);
+  });
+  renderCard(idx);
+}
+
+function renderCard(idx){
+  stopAudio();
+  const c=cards[idx];
+  const t=section;
+  const isBonus=t==='wirid'&&idx>=WIRID_BONUS;
+  const isReminder=c.reminder===true;
+  const isDivider=c.divider===true;
+  const isScroll=c.scroll===true;
+  const hasImg=c.img&&c.img.length>0;
+  const arabText=c.arab_unicode||c.arab||'';
+  const numLabel=(t==='solat'||t==='harian')?(idx+1):c.num;
+  const numCls='c-num '+(isBonus?'bonus':t);
+  let audioFile='',audioDir='';
+  if(t==='wirid'&&WIRID_AUDIO[c.id]){audioFile=WIRID_AUDIO[c.id];audioDir='./audio';}
+  else if(t==='mathurat'&&typeof MATHURAT_AUDIO!=='undefined'&&MATHURAT_AUDIO[c.id]){audioFile=MATHURAT_AUDIO[c.id];audioDir='./audio';}
+  else if(t==='wpanjang'&&typeof PANJANG_AUDIO!=='undefined'&&PANJANG_AUDIO[c.id]){audioFile=PANJANG_AUDIO[c.id];audioDir='./audio';}
+  else if(t==='wpendek'&&typeof PENDEK_AUDIO!=='undefined'&&PENDEK_AUDIO[c.id]){audioFile=PENDEK_AUDIO[c.id];audioDir='./audio';}
+  else if(t==='solat'&&typeof SOLAT_AUDIO!=='undefined'&&SOLAT_AUDIO[c.id]){audioFile=SOLAT_AUDIO[c.id];audioDir='./audio';}
+  const audioBar=audioFile?`<div class="audio-bar ${t}" id="audioBar"><button class="audio-btn" id="audioBtn" aria-label="Main audio">▶</button><div class="audio-prog" id="audioProg"><div class="audio-prog-fill" id="audioProgFill"></div></div><span class="audio-time" id="audioTime">0:00</span></div>`:'';
+
+  let arabSec='';
+  if(hasImg) arabSec=`<div class="arab-img-wrap"><img src="${c.img}" alt="Arab" style="${isScroll?'max-height:none':''}" onerror="if(this.src.slice(-4)==='.jpg'){this.src=this.src.slice(0,-4)+'.png';}else{var w=this.closest('.arab-img-wrap'); if(w) w.style.display='none';}"></div>`;
+  else if(arabText) arabSec=`<div class="arab-uni-wrap"><div class="arab-uni-text">${arabText}</div></div>`;
+
+  let subHtml='';
+  if(t==='solat'&&c.step) subHtml=`<span class="step-badge">${c.step}</span>`;
+  else if((t==='wirid'||t==='mathurat'||t==='wpendek'||t==='wpanjang')&&c.kali) subHtml=`<span class="c-sub ${t}">Bilangan: ${c.kali}</span>`;
+
+  let body='';
+  if(isReminder){
+    body=`<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:200px;gap:16px;padding:30px 20px"><div style="font-size:3rem">🤲</div><div style="font-size:1.1rem;color:#a5d6a7;font-weight:600;text-align:center">${c.tajuk}</div><div style="font-size:0.82rem;color:#5a9e5a;text-align:center;line-height:1.6">${c.kali&&c.kali.toLowerCase()!=='baca sendiri'?'Baca sebanyak '+c.kali+' mengikut amalan masing-masing.':'Baca sendiri mengikut amalan masing-masing.'}<br>Hayati setiap patah perkataan dengan penuh khusyuk.</div></div>`;
+  }else if(c.niat){
+    body=niatHTML();
+  }else{
+    body=`
+      ${arabSec}
+      ${c.rumi?`<div class="rumi-sec ${t}"><div class="sec-lbl ${t}">Rumi</div><div class="rumi-txt ${t}">${c.rumi}</div></div>`:''}
+      ${c.maksud?`<div class="mak-sec"><div class="sec-lbl ${t}">Maksud</div><div class="mak-txt">${c.maksud}</div></div>`:''}
+    `;
+  }
+
+  if(isDivider){
+    document.getElementById('cardEl').innerHTML=`
+      <div class="c-body ${t}"><div class="c-inner" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:260px;gap:18px;padding:40px 24px;text-align:center">
+        <div style="font-size:2.4rem">✨</div>
+        <div style="font-size:1.18rem;color:#ffd479;font-weight:700;line-height:1.5">${c.tajuk}</div>
+        <div style="width:46px;height:3px;background:#ffd479;opacity:.5;border-radius:2px"></div>
+        <div style="font-size:0.82rem;color:#b08d4a;line-height:1.7">Amalan berikut adalah <strong>pilihan</strong>.<br>Teruskan jika ingin menambah amalan selepas wirid.</div>
+      </div></div>`;
+  }else{
+    document.getElementById('cardEl').innerHTML=`
+    <div class="c-header ${t}">
+      <div class="${numCls}">${numLabel}</div>
+      <div class="c-meta">
+        <div class="c-tajuk ${t}">${c.tajuk}</div>
+        ${subHtml}
+      </div>
+    </div>
+    <div class="c-body ${t}"><div class="c-inner">${audioBar}${body}</div></div>
+  `;
+  }
+
+  wireAudio(audioDir,audioFile);
+
+  document.getElementById('pbFill').style.width=((idx+1)/cards.length*100).toFixed(2)+'%';
+  document.getElementById('hdrProg').textContent=(idx+1)+' / '+cards.length;
+  document.getElementById('btnPrev').disabled=idx===0;
+  document.getElementById('btnNext').disabled=idx===cards.length-1;
+
+  const dots=document.getElementById('navDots').children;
+  for(let i=0;i<dots.length;i++){ dots[i].classList.toggle('active',i===idx); }
+}
+
+function goTo(idx){
+  if(isAnim||idx===current) return;
+  const dir=idx>current?'left':'right';
+  isAnim=true;
+  const ce=document.getElementById('cardEl');
+  ce.classList.remove('active');
+  ce.classList.add(dir==='left'?'out-left':'out-right');
+  setTimeout(()=>{
+    try{
+      current=idx; renderCard(current);
+      ce.classList.remove('out-left','out-right');
+      ce.classList.add(dir==='left'?'in-right':'in-left');
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{
+        ce.classList.remove('in-left','in-right');
+        ce.classList.add('active');
+        isAnim=false;
+      }));
+    }catch(e){isAnim=false; throw e;}
+  },300);
+}
+
+function navigate(delta){
+  const next=current+delta;
+  if(next<0||next>=cards.length) return;
+  goTo(next);
+}
+
+document.addEventListener('keydown',e=>{
+  if(!document.getElementById('v-card').classList.contains('active')) return;
+  if(e.key==='ArrowRight'||e.key==='ArrowDown') navigate(1);
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp') navigate(-1);
+  if(e.key==='Escape') goBack();
+});
+let tx=0;
+document.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;},{passive:true});
+document.addEventListener('touchend',e=>{
+  if(!document.getElementById('v-card').classList.contains('active')) return;
+  const dx=e.changedTouches[0].clientX-tx;
+  if(Math.abs(dx)>50) navigate(dx<0?1:-1);
+},{passive:true});
+</script>
+
+<script>
+(function(){
+  var cs=document.getElementById('cntSolat');
+  var cw=document.getElementById('cntWirid');
+  var ch=document.getElementById('cntHarian');
+  if(cs) cs.textContent=SOLAT.length+' kad';
+  if(cw) cw.textContent=WIRID.length+' kad';
+  var cmm=document.getElementById('cntMathurat');
+  if(cmm) cmm.textContent=MATHURAT.length+' kad';
+  if(ch) ch.textContent=HARIAN.length+' kad';
+  var cwk=document.getElementById('cntWPendek');
+  if(cwk) cwk.textContent=WIRID_PENDEK.length+' kad';
+  var cwp=document.getElementById('cntWPanjang');
+  if(cwp) cwp.textContent=WIRID_PANJANG.length+' kad';
+})();
+</script>
+<!-- Bar Muat Turun Offline -->
+<div id="dlBar">
+  <div class="dl-row">
+    <div class="dl-txt">
+      <div class="dl-title" id="dlTitle">Simpan untuk offline</div>
+      <div class="dl-sub" id="dlSub">Muat turun semua audio &amp; gambar ke peranti anda.</div>
+    </div>
+    <button id="dlBtn" onclick="startOfflineDownload()">Muat Turun</button>
+    <button class="dl-close" id="dlClose" onclick="hideDlBar()" title="Tutup">✕</button>
+  </div>
+  <div class="dl-track"><div class="dl-fill" id="dlFill"></div></div>
+</div>
+
+<script src="precache-manifest.js"></script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load',function(){
+    navigator.serviceWorker.register('sw.js').catch(function(){});
+  });
+}
+
+/* ===== Pengurus Muat Turun Offline =====
+   - Auto-mula 3 saat selepas halaman dibuka (jika online & belum lengkap).
+   - Butang manual + progress bar. Fail sedia dalam cache akan dilangkau.
+   - Gambar .jpg yang gagal akan dicuba semula sebagai .png (padan fallback <img>). */
+(function(){
+  var CACHE='panduan-ibadah-v5';
+  var busy=false;
+
+  function el(id){return document.getElementById(id);}
+  function showBar(){el('dlBar').classList.add('show');}
+  window.hideDlBar=function(){el('dlBar').classList.remove('show');
+    try{sessionStorage.setItem('dlBarHidden','1');}catch(e){}};
+
+  // Kunci cache: audio disimpan ikut pathname (sama dgn sw.js), lain ikut URL penuh
+  function cacheKey(u){
+    var abs=new URL(u,location.href);
+    if(/\.mp3$/i.test(abs.pathname)) return abs.pathname;
+    return abs.href;
+  }
+  function fetchURL(u){
+    var abs=new URL(u,location.href);
+    // encode setiap segmen (nama fail ada ruang)
+    abs.pathname=abs.pathname.split('/').map(function(s){return encodeURIComponent(decodeURIComponent(s));}).join('/');
+    return abs;
+  }
+
+  function checkMissing(){
+    if(!('caches' in window)||typeof APP_ASSETS==='undefined') return Promise.resolve(null);
+    return caches.open(CACHE).then(function(c){
+      return Promise.all(APP_ASSETS.map(function(u){
+        return c.match(cacheKey(u)).then(function(hit){
+          if(hit) return null;
+          // gambar mungkin disimpan sebagai .png (fallback)
+          if(/\.jpg$/i.test(u)){
+            return c.match(cacheKey(u.replace(/\.jpg$/i,'.png'))).then(function(h2){return h2?null:u;});
+          }
+          return u;
+        });
+      })).then(function(res){return res.filter(Boolean);});
+    });
+  }
+
+  function setProgress(done,total){
+    var pct=total?Math.round(done/total*100):100;
+    el('dlFill').style.width=pct+'%';
+    el('dlTitle').textContent='Memuat turun… '+pct+'%';
+    el('dlSub').textContent=done+' / '+total+' fail';
+  }
+  function setDone(failed){
+    var bar=el('dlBar');bar.classList.remove('busy');bar.classList.add('done');
+    if(failed&&failed.length){
+      el('dlTitle').textContent='Hampir siap — '+failed.length+' fail gagal';
+      el('dlSub').textContent='Semak sambungan & cuba lagi.';
+      el('dlBtn').textContent='Cuba Lagi';el('dlBtn').disabled=false;el('dlBtn').style.display='';
+    }else{
+      el('dlTitle').textContent='✓ Sedia digunakan offline';
+      el('dlSub').textContent='Semua audio & gambar telah disimpan dalam peranti ini.';
+      el('dlBtn').style.display='none';
+      setTimeout(window.hideDlBar,6000);
+    }
+  }
+
+  window.startOfflineDownload=function(){
+    if(busy) return; busy=true;
+    var bar=el('dlBar');bar.classList.add('show','busy');bar.classList.remove('done');
+    el('dlBtn').disabled=true;el('dlBtn').style.display='none';el('dlClose').style.display='none';
+    checkMissing().then(function(missing){
+      if(missing===null){busy=false;return;}
+      var total=APP_ASSETS.length, done=total-missing.length, failed=[];
+      setProgress(done,total);
+      if(!missing.length){busy=false;el('dlClose').style.display='';setDone([]);return;}
+      caches.open(CACHE).then(function(c){
+        var i=0, CONC=4;
+        function next(){
+          if(i>=missing.length) return Promise.resolve();
+          var u=missing[i++];
+          return fetch(fetchURL(u).href).then(function(r){
+            if(r&&r.status===200) return c.put(cacheKey(u),r);
+            // fallback .jpg -> .png (sama macam onerror pada <img>)
+            if(/\.jpg$/i.test(u)){
+              var p=u.replace(/\.jpg$/i,'.png');
+              return fetch(fetchURL(p).href).then(function(r2){
+                if(r2&&r2.status===200) return c.put(cacheKey(p),r2);
+                failed.push(u);
+              });
+            }
+            failed.push(u);
+          }).catch(function(){failed.push(u);})
+            .then(function(){done++;setProgress(done,total);return next();});
+        }
+        var lanes=[];for(var k=0;k<CONC;k++) lanes.push(next());
+        Promise.all(lanes).then(function(){
+          busy=false;el('dlClose').style.display='';setDone(failed);
+        });
+      });
+    });
+  };
+
+  // Semasa halaman dibuka: tunjuk status & auto-mula jika belum lengkap
+  window.addEventListener('load',function(){
+    if(!('caches' in window)||typeof APP_ASSETS==='undefined') return;
+    setTimeout(function(){
+      checkMissing().then(function(missing){
+        if(missing===null) return;
+        if(!missing.length){
+          // Sudah lengkap — tunjuk pengesahan ringkas sekali per sesi
+          try{if(sessionStorage.getItem('dlBarHidden')) return;}catch(e){}
+          showBar();setDone([]);
+        }else if(navigator.onLine!==false){
+          startOfflineDownload(); // auto-mula
+        }else{
+          showBar(); // offline & belum lengkap — biar pengguna tahu
+          el('dlTitle').textContent='Belum lengkap untuk offline';
+          el('dlSub').textContent='Sambung internet & tekan Muat Turun.';
+        }
+      });
+    },3000);
+  });
+})();
+</script>
+</body>
+</html>

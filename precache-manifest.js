@@ -5,11 +5,11 @@ self.APP_CORE = [
   "./index.html",
   "./manifest.webmanifest",
   "./precache-manifest.js",
-  "./icons/icon-192.png",
-  "./icons/icon-512.png",
-  "./icons/icon-maskable-192.png",
-  "./icons/icon-maskable-512.png",
-  "./icons/apple-touch-icon-180.png"
+  "./icon/icon-192.png",
+  "./icon/icon-512.png",
+  "./icon/icon-maskable-192.png",
+  "./icon/icon-maskable-512.png",
+  "./icon/apple-touch-icon-180.png"
 ];
 
 self.APP_ASSETS = [

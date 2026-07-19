@@ -5,14 +5,23 @@ self.APP_CORE = [
   "./index.html",
   "./manifest.webmanifest",
   "./precache-manifest.js",
-  "./icon/icon-192.png",
-  "./icon/icon-512.png",
-  "./icon/icon-maskable-192.png",
-  "./icon/icon-maskable-512.png",
-  "./icon/apple-touch-icon-180.png"
+  "./icons/icon-192.png",
+  "./icons/icon-512.png",
+  "./icons/icon-maskable-192.png",
+  "./icons/icon-maskable-512.png",
+  "./icons/apple-touch-icon-180.png"
 ];
 
 self.APP_ASSETS = [
+  "./quran-img/Al-Qadr.jpg",
+  "./quran-img/Al-Qariah.jpg",
+  "./quran-img/At-Takathur.jpg",
+  "./quran-img/Al-Humazah.jpg",
+  "./quran-img/Al-Fil.jpg",
+  "./quran-img/Quraysh.jpg",
+  "./quran-img/Al-Maun.jpg",
+  "./quran-img/Al-Kawthar.jpg",
+  "./quran-img/Al-Masad.jpg",
   "./quran-img/Al-Baqarah 1-5.jpg",
   "./quran-img/Al-Baqarah 163.jpg",
   "./quran-img/Al-Baqarah 256-257.jpg",
@@ -149,5 +158,14 @@ self.APP_ASSETS = [
   "./audio/Tahmid Pembuka.mp3",
   "./audio/Takbir Pembuka.mp3",
   "./audio/Tasbih Pembuka.mp3",
-  "./audio/Zikir Memohon Keselamatan.mp3"
+  "./audio/Zikir Memohon Keselamatan.mp3",
+  "./audio/Al-Qadr.mp3",
+  "./audio/Al-Qariah.mp3",
+  "./audio/At-Takathur.mp3",
+  "./audio/Al-Humazah.mp3",
+  "./audio/Al-Fil.mp3",
+  "./audio/Quraysh.mp3",
+  "./audio/Al-Maun.mp3",
+  "./audio/Al-Kawthar.mp3",
+  "./audio/Al-Masad.mp3"
 ];

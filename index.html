@@ -11,8 +11,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Ibadah">
 <meta name="description" content="Panduan doa dalam solat, wirid & zikir selepas solat, dan doa-doa harian.">
-<link rel="apple-touch-icon" href="icon/apple-touch-icon-180.png">
-<link rel="icon" type="image/png" sizes="512x512" href="icon/icon-512.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon-180.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Amiri:wght@400;700&display=swap');
   *{margin:0;padding:0;box-sizing:border-box;}
@@ -254,6 +254,40 @@
   .audio-bar.wpanjang .audio-prog{background:#12362a;}
   .audio-bar.wpanjang .audio-prog-fill{background:#4cd98a;}
   .audio-bar.wpanjang .audio-time{color:#4cd98a;}
+  /* Ayat-ayat Lazim (emas) */
+  .land-btn.lazim{background:linear-gradient(145deg,#2b210d,#1f1809);border-color:#6a4d1a;}
+  .land-btn.lazim:hover{border-color:#ffb300;}
+  .btn-lbl.lazim{color:#ffd54f;}
+  .grid-header.lazim{background:linear-gradient(135deg,#2b210d,#1f1809);border-color:#6a4d1a;}
+  .grid-title.lazim{color:#ffd54f;}
+  .grid-scroll.lazim{scrollbar-color:#6a4d1a transparent;}
+  .grid-card.lazim{background:linear-gradient(145deg,#2b210d,#1f1809);border-color:#6a4d1a;}
+  .grid-card.lazim:hover{border-color:#ffb300;transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.4);}
+  .gc-tajuk.lazim{color:#ffe082;}
+  .card-header2.lazim{background:linear-gradient(135deg,#2b210d,#1f1809);border-color:#6a4d1a;}
+  .hdr-title.lazim{color:#ffd54f;}
+  .pb-wrap.lazim{background:#1f1809;}
+  .pb-fill.lazim{background:linear-gradient(90deg,#ffb300,#ffd54f);}
+  .card.lazim{background:linear-gradient(160deg,#2b210d,#1f1809);border:1px solid #6a4d1a;}
+  .c-header.lazim{background:linear-gradient(135deg,#3d2f11,#1f1809);border-color:#6a4d1a;}
+  .c-num.lazim{background:linear-gradient(135deg,#ffb300,#c68b00);box-shadow:0 2px 8px rgba(255,179,0,0.4);color:#1f1809;}
+  .c-tajuk.lazim{color:#ffe082;}
+  .c-sub.lazim{color:#ffc933;}
+  .c-body.lazim{scrollbar-color:#6a4d1a transparent;}
+  .c-body.lazim::-webkit-scrollbar-thumb{background:#6a4d1a;}
+  .rumi-sec.lazim{background:rgba(255,179,0,0.07);border-color:#ffb300;}
+  .sec-lbl.lazim{color:#ffc933;}
+  .rumi-txt.lazim{color:#ffecb3;}
+  .nav-bar2.lazim{background:linear-gradient(0deg,#1a1408,#1a1408ee);}
+  .nav-btn.lazim{background:linear-gradient(135deg,#3d2f11,#1f1809);border-color:#6a4d1a;color:#ffd54f;}
+  .nav-btn.lazim:hover{background:#6a4d1a;color:#fff;transform:scale(1.05);}
+  .dot.lazim{background:#6a4d1a;}
+  .dot.lazim.active{background:#ffb300;transform:scale(1.5);}
+  .audio-bar.lazim{background:#221a0a;border-color:#6a4d1a;}
+  .audio-bar.lazim .audio-btn{background:#6a4d1a;color:#ffecb3;}
+  .audio-bar.lazim .audio-prog{background:#332610;}
+  .audio-bar.lazim .audio-prog-fill{background:#ffca4d;}
+  .audio-bar.lazim .audio-time{color:#ffca4d;}
   /* Audio bar Solat (biru) */
   .audio-bar.solat{background:#0d1b2a;border-color:#1e3a5c;}
   .audio-bar.solat .audio-btn{background:#1e3a5c;color:#cfe4f7;}
@@ -365,6 +399,13 @@
       <div>
         <div class="btn-lbl harian">Doa-Doa<br>Harian</div>
         <div class="btn-cnt" style="color:#00bcd4" id="cntHarian">41 kad</div>
+      </div>
+    </div>
+    <div class="land-btn lazim" onclick="openGrid('lazim')">
+      <div class="btn-icon">📜</div>
+      <div>
+        <div class="btn-lbl lazim">Ayat-ayat<br>Lazim</div>
+        <div class="btn-cnt" style="color:#ffb300" id="cntLazim">15 kad</div>
       </div>
     </div>
   </div>
@@ -653,7 +694,77 @@ const MATHURAT_AUDIO={
   m42:"Ali Imran 26-27.mp3",
   m43:"Doa Rabitah.mp3"
 };
-const TITLES={solat:'Doa dalam Solat',wirid:'Wirid & Zikir Selepas Solat (Biasa)',wpendek:'Wirid & Zikir Selepas Solat (Pendek)',wpanjang:'Wirid & Zikir Selepas Solat (Panjang)',harian:'Doa-Doa Harian',mathurat:"Al-Ma'thurat"};
+const TITLES={solat:'Doa dalam Solat',wirid:'Wirid & Zikir Selepas Solat (Biasa)',wpendek:'Wirid & Zikir Selepas Solat (Pendek)',wpanjang:'Wirid & Zikir Selepas Solat (Panjang)',harian:'Doa-Doa Harian',mathurat:"Al-Ma'thurat",lazim:'Ayat-ayat Lazim'};
+
+/* ===================================================================
+   AYAT-AYAT LAZIM — surah pendek untuk hafalan bacaan dalam solat.
+   Maksud dipecahkan mengikut nombor ayat.
+   =================================================================== */
+const LAZIM=[
+  {id:"l01",num:"1",tajuk:"Surah Al-Fatihah",img:"./quran-img/Al-Fatihah.jpg",arab_unicode:"",
+   rumi:"(1) Bismillahir Rahmanir Rahim. (2) Alhamdu Lillahi Rabbil Alamin. (3) Ar Rahmanir Rahim. (4) Maliki Yawmid Din. (5) Iyyaka Na'budu Wa Iyyaka Nasta'in. (6) Ihdinas Siratal Mustaqim. (7) Siratal Lazina An'amta Alayhim Ghayril Maghdubi Alayhim Wa Lad Dallin.",
+   maksud:"(1) Dengan nama Allah, Yang Maha Pemurah, lagi Maha Mengasihani. (2) Segala puji tertentu bagi Allah, Tuhan yang memelihara dan mentadbirkan sekalian alam. (3) Yang Maha Pemurah, lagi Maha Mengasihani. (4) Yang Menguasai pemerintahan Hari Pembalasan (Hari Akhirat). (5) Engkaulah sahaja (Ya Allah) yang kami sembah, dan kepada Engkaulah sahaja kami memohon pertolongan. (6) Tunjukilah kami jalan yang lurus. (7) Iaitu jalan orang-orang yang Engkau telah kurniakan nikmat kepada mereka, bukan (jalan) orang-orang yang Engkau telah murkai, dan bukan pula (jalan) orang-orang yang sesat."},
+  {id:"l02",num:"97",tajuk:"Surah Al-Qadr",img:"./quran-img/Al-Qadr.jpg",arab_unicode:"",
+   rumi:"Bismillahir Rahmanir Rahim. (1) Inna Anzalnahu Fi Laylatil Qadr. (2) Wa Ma Adraka Ma Laylatul Qadr. (3) Laylatul Qadri Khayrum Min Alfi Syahr. (4) Tanazzalul Mala'ikatu War Ruhu Fiha Bi Izni Rabbihim Min Kulli Amr. (5) Salamun Hiya Hatta Matla'il Fajr.",
+   maksud:"(1) Sesungguhnya Kami telah menurunkan Al-Qur'an ini pada Malam Lailatul-Qadar. (2) Dan apa jalannya engkau dapat mengetahui apa dia kebesaran Malam Lailatul-Qadar itu? (3) Malam Lailatul-Qadar lebih baik daripada seribu bulan. (4) Pada malam itu, turun malaikat dan Jibril dengan izin Tuhan mereka, kerana membawa segala perkara (yang ditakdirkan berlakunya pada tahun berikutnya). (5) Sejahteralah malam (yang berkat) itu hingga terbit fajar."},
+  {id:"l03",num:"101",tajuk:"Surah Al-Qari'ah",img:"./quran-img/Al-Qariah.jpg",arab_unicode:"",
+   rumi:"Bismillahir Rahmanir Rahim. (1) Al Qari'ah. (2) Mal Qari'ah. (3) Wa Ma Adraka Mal Qari'ah. (4) Yawma Yakunun Nasu Kal Farasyil Mabsus. (5) Wa Takunul Jibalu Kal Ihnil Manfusy. (6) Fa Amma Man Saqulat Mawazinuh. (7) Fahuwa Fi Isyatir Radiyah. (8) Wa Amma Man Khaffat Mawazinuh. (9) Fa Ummuhu Hawiyah. (10) Wa Ma Adraka Ma Hiyah. (11) Narun Hamiyah.",
+   maksud:"(1) Hari yang menggemparkan. (2) Apakah dia hari yang menggemparkan itu? (3) Dan apa jalannya engkau dapat mengetahui kedahsyatan hari yang menggemparkan itu? (4) (Hari itu ialah) hari manusia menjadi seperti kelkatu yang terbang berkeliaran. (5) Dan gunung-ganang menjadi seperti bulu yang dibusar berterbangan. (6) Setelah berlaku demikian, maka sesiapa yang berat timbangan amal baiknya. (7) Maka ia berada dalam kehidupan yang senang lenang. (8) Sebaliknya sesiapa yang ringan timbangan amal baiknya. (9) Maka tempat kembalinya ialah \"Haawiyah\". (10) Dan apa jalannya engkau dapat mengetahui apa dia \"Haawiyah\" itu? (11) (Haawiyah itu ialah) api yang panas membakar."},
+  {id:"l04",num:"102",tajuk:"Surah At-Takathur",img:"./quran-img/At-Takathur.jpg",arab_unicode:"",
+   rumi:"Bismillahir Rahmanir Rahim. (1) Alhakumut Takasur. (2) Hatta Zurtumul Maqabir. (3) Kalla Sawfa Ta'lamun. (4) Summa Kalla Sawfa Ta'lamun. (5) Kalla Law Ta'lamuna Ilmal Yaqin. (6) Latarawunnal Jahim. (7) Summa Latarawunnaha Aynal Yaqin. (8) Summa Latus'alunna Yawma'izin Anin Na'im.",
+   maksud:"(1) Kamu telah dilalaikan oleh perbuatan berlumba-lumba untuk mendapat sebanyak-banyaknya (harta benda, anak-pinak, pangkat dan pengaruh). (2) Sehingga kamu masuk kubur. (3) Jangan sekali-kali (bersikap demikian)! Kamu akan mengetahui kelak (akibatnya yang buruk semasa hendak mati)! (4) Sekali lagi (diingatkan): jangan sekali-kali (kamu bersikap demikian)! Kamu akan mengetahui kelak (akibatnya yang buruk pada hari kiamat)! (5) Demi sesungguhnya! Kalaulah kamu mengetahui (apa yang kamu akan hadapi) dengan pengetahuan yang yakin, (tentulah kamu akan mengerjakan perkara-perkara yang menjadi bekalan kamu untuk hari akhirat). (6) (Ingatlah) demi sesungguhnya! Kamu akan melihat neraka yang marak menjulang. (7) Selepas itu demi sesungguhnya! Kamu akan melihatnya dengan penglihatan yang yakin. (8) Selain dari itu, sesungguhnya kamu akan ditanya pada hari itu tentang segala nikmat (yang kamu telah menikmatinya)!"},
+  {id:"l05",num:"104",tajuk:"Surah Al-Humazah",img:"./quran-img/Al-Humazah.jpg",arab_unicode:"",
+   rumi:"Bismillahir Rahmanir Rahim. (1) Waylul Likulli Humazatil Lumazah. (2) Allazi Jama'a Malaw Wa Addadah. (3) Yahsabu Anna Malahu Akhladah. (4) Kalla Layumbazanna Fil Hutamah. (5) Wa Ma Adraka Mal Hutamah. (6) Narullahil Muqadah. (7) Allati Tattali'u Alal Af'idah. (8) Innaha Alayhim Mu'sadah. (9) Fi Amadim Mumaddadah.",
+   maksud:"(1) Kecelakaan besar bagi tiap-tiap pencaci, pengeji. (2) Yang mengumpulkan harta dan berulang-ulang menghitung kekayaannya. (3) Ia menyangka bahawa hartanya itu dapat mengekalkannya (dalam dunia ini)! (4) Tidak! Sesungguhnya dia akan dicampakkan ke dalam \"Al-Hutamah\". (5) Dan apa jalannya engkau dapat mengetahui apa dia \"Al-Hutamah\" itu? (6) (Al-Hutamah) ialah api Allah yang dinyalakan (dengan perintah-Nya). (7) Yang naik menjulang ke hati. (8) Sesungguhnya api neraka itu ditutup rapat ke atas mereka. (9) (Mereka terikat di situ) pada tiang-tiang yang panjang."},
+  {id:"l06",num:"105",tajuk:"Surah Al-Fil",img:"./quran-img/Al-Fil.jpg",arab_unicode:"",
+   rumi:"Bismillahir Rahmanir Rahim. (1) Alam Tara Kayfa Fa'ala Rabbuka Bi As-habil Fil. (2) Alam Yaj'al Kaydahum Fi Tadlil. (3) Wa Arsala Alayhim Tayran Ababil. (4) Tarmihim Bihijaratim Min Sijjil. (5) Faja'alahum Ka'asfim Ma'kul.",
+   maksud:"(1) Tidakkah engkau mengetahui bagaimana Tuhanmu telah melakukan kepada angkatan tentera (yang dipimpin oleh pembawa) Gajah? (2) Bukankah Tuhanmu telah menjadikan rancangan jahat mereka dalam keadaan yang rugi dan memusnahkan mereka? (3) Dan Ia telah menghantarkan kepada mereka (rombongan) burung berpasuk-pasukan. (4) Yang melontar mereka dengan batu-batu dari sejenis tanah yang dibakar keras. (5) Lalu Ia menjadikan mereka hancur berkecai seperti daun-daun kayu yang dimakan ulat."},
+  {id:"l07",num:"106",tajuk:"Surah Quraysh",img:"./quran-img/Quraysh.jpg",arab_unicode:"",
+   rumi:"Bismillahir Rahmanir Rahim. (1) Li'ilafi Quraysy. (2) Ilafihim Rihlatasy Syita'i Was Sayf. (3) Falya'budu Rabba Hazal Bayt. (4) Allazi At'amahum Min Ju'iw Wa Amanahum Min Khawf.",
+   maksud:"(1) Kerana kebiasaan aman tenteram kaum Quraisy (penduduk Makkah). (2) (Iaitu) kebiasaan aman tenteram perjalanan mereka (menjalankan perniagaan) pada musim sejuk (ke negeri Yaman) dan pada musim panas (ke negeri Syam). (3) Maka hendaklah mereka menyembah Tuhan yang menguasai rumah (Kaabah) ini. (4) Tuhan yang memberi mereka penghidupan: menyelamatkan mereka dari kelaparan, dan mengamankan mereka dari ketakutan."},
+  {id:"l08",num:"107",tajuk:"Surah Al-Ma'un",img:"./quran-img/Al-Maun.jpg",arab_unicode:"",
+   rumi:"Bismillahir Rahmanir Rahim. (1) Ara'aytal Lazi Yukazzibu Bid Din. (2) Fazalikal Lazi Yadu'ul Yatim. (3) Wa La Yahuddu Ala Ta'amil Miskin. (4) Fawaylul Lil Musallin. (5) Allazina Hum An Salatihim Sahun. (6) Allazina Hum Yura'un. (7) Wa Yamna'unal Ma'un.",
+   maksud:"(1) Tahukah engkau akan orang yang mendustakan agama (meliputi hari pembalasan)? (2) Orang itu ialah yang menindas serta berlaku zalim kepada anak yatim. (3) Dan ia tidak menggalakkan untuk memberi makanan yang berhak diterima oleh orang miskin. (4) (Kalau orang yang demikian dikira dari bilangan orang-orang yang mendustakan agama), maka kecelakaan besar bagi orang-orang ahli sembahyang. (5) (Iaitu) mereka yang berkeadaan lalai daripada menyempurnakan sembahyangnya. (6) (Juga bagi) orang-orang yang berkeadaan riak. (7) Dan orang-orang yang tidak memberi sedikit pertolongan (kepada orang yang berhak mendapatnya)."},
+  {id:"l09",num:"108",tajuk:"Surah Al-Kawthar",img:"./quran-img/Al-Kawthar.jpg",arab_unicode:"",
+   rumi:"Bismillahir Rahmanir Rahim. (1) Inna A'taynakal Kawsar. (2) Fasalli Lirabbika Wanhar. (3) Inna Syani'aka Huwal Abtar.",
+   maksud:"(1) Sesungguhnya Kami telah mengurniakan kepadamu (wahai Muhammad) kebaikan yang banyak (di dunia dan di akhirat). (2) Oleh itu, kerjakanlah sembahyang kerana Tuhanmu semata-mata, dan sembelihlah korban (sebagai bersyukur). (3) Sesungguhnya orang yang bencikan engkau, dialah yang terputus (dari mendapat sebarang perkara yang diingininya)."},
+  {id:"l10",num:"109",tajuk:"Surah Al-Kafirun",img:"./quran-img/Al-Kafirun.jpg",arab_unicode:"",
+   rumi:"Bismillahir Rahmanir Rahim. (1) Qul Ya Ayyuhal Kafirun. (2) La A'budu Ma Ta'budun. (3) Wa La Antum Abiduna Ma A'bud. (4) Wa La Ana Abidum Ma Abattum. (5) Wa La Antum Abiduna Ma A'bud. (6) Lakum Dinukum Wa Liya Din.",
+   maksud:"(1) Katakanlah (wahai Muhammad): \"Hai orang-orang kafir! (2) Aku tidak akan menyembah apa yang kamu sembah. (3) Dan kamu tidak mahu menyembah (Allah) yang aku sembah. (4) Dan aku tidak akan beribadat secara kamu beribadat. (5) Dan kamu pula tidak mahu beribadat secara aku beribadat. (6) Bagi kamu agama kamu, dan bagiku agamaku\"."},
+  {id:"l11",num:"110",tajuk:"Surah An-Nasr",img:"./quran-img/An-Nasr.jpg",arab_unicode:"",
+   rumi:"Bismillahir Rahmanir Rahim. (1) Iza Ja'a Nasrullahi Wal Fath. (2) Wa Ra'aytan Nasa Yadkhuluna Fi Dinillahi Afwaja. (3) Fasabbih Bihamdi Rabbika Wastaghfirh, Innahu Kana Tawwaba.",
+   maksud:"(1) Apabila datang pertolongan Allah dan kemenangan (semasa engkau wahai Muhammad berjaya menguasai negeri Makkah). (2) Dan engkau melihat manusia masuk dalam agama Allah beramai-ramai. (3) Maka ucapkanlah tasbih dengan memuji Tuhanmu dan mintalah ampun kepada-Nya, sesungguhnya Dia amat menerima taubat."},
+  {id:"l12",num:"111",tajuk:"Surah Al-Masad",img:"./quran-img/Al-Masad.jpg",arab_unicode:"",
+   rumi:"Bismillahir Rahmanir Rahim. (1) Tabbat Yada Abi Lahabiw Wa Tabb. (2) Ma Aghna Anhu Maluhu Wa Ma Kasab. (3) Sayasla Naran Zata Lahab. (4) Wamra'atuhu Hammalatal Hatab. (5) Fi Jidiha Hablum Mim Masad.",
+   maksud:"(1) Binasalah kedua-dua tangan Abu Lahab, dan binasalah ia bersama! (2) Hartanya dan segala yang diusahakannya tidak dapat menolongnya. (3) Ia akan menderita bakaran api neraka yang marak menjulang. (4) Dan juga isterinya, seorang perempuan pembawa kayu api. (5) Di lehernya sejenis tali, dari tali-tali yang dipintal."},
+  {id:"l13",num:"112",tajuk:"Surah Al-Ikhlas",img:"./quran-img/Al-Ikhlas.jpg",arab_unicode:"",
+   rumi:"Bismillahir Rahmanir Rahim. (1) Qul Huwallahu Ahad. (2) Allahus Samad. (3) Lam Yalid Wa Lam Yulad. (4) Wa Lam Yakul Lahu Kufuwan Ahad.",
+   maksud:"(1) Katakanlah (wahai Muhammad): \"(Tuhanku) ialah Allah Yang Maha Esa. (2) Allah Yang menjadi tumpuan sekalian makhluk untuk memohon sebarang hajat. (3) Ia tiada beranak, dan Ia pula tidak diperanakkan. (4) Dan tidak ada sesiapa pun yang setara dengan-Nya\"."},
+  {id:"l14",num:"113",tajuk:"Surah Al-Falaq",img:"./quran-img/Al-Falaq.jpg",arab_unicode:"",
+   rumi:"Bismillahir Rahmanir Rahim. (1) Qul Auzu Birabbil Falaq. (2) Min Syarri Ma Khalaq. (3) Wa Min Syarri Ghasiqin Iza Waqab. (4) Wa Min Syarrin Naffasati Fil Uqad. (5) Wa Min Syarri Hasidin Iza Hasad.",
+   maksud:"(1) Katakanlah (wahai Muhammad): \"Aku berlindung kepada (Allah) Tuhan yang menciptakan sekalian makhluk. (2) Dari bencana makhluk-makhluk yang Ia ciptakan. (3) Dan dari bahaya gelap apabila ia masuk. (4) Dan dari kejahatan makhluk-makhluk yang menghembus-hembus pada simpulan-simpulan (dan ikatan-ikatan). (5) Dan dari kejahatan orang yang dengki apabila ia melakukan dengkinya\"."},
+  {id:"l15",num:"114",tajuk:"Surah An-Nas",img:"./quran-img/An-Naas.jpg",arab_unicode:"",
+   rumi:"Bismillahir Rahmanir Rahim. (1) Qul Auzu Birabbin Nas. (2) Malikin Nas. (3) Ilahin Nas. (4) Min Syarril Waswasil Khannas. (5) Allazi Yuwaswisu Fi Sudurin Nas. (6) Minal Jinnati Wan Nas.",
+   maksud:"(1) Katakanlah (wahai Muhammad): \"Aku berlindung kepada (Allah) Pemelihara sekalian manusia. (2) Yang Menguasai sekalian manusia. (3) Tuhan yang berhak disembah oleh sekalian manusia. (4) Dari kejahatan pembisik penghasut yang timbul tenggelam. (5) Yang melemparkan bisikan dan hasutannya ke dalam hati manusia. (6) (Iaitu pembisik dan penghasut) dari kalangan jin dan manusia\"."}
+];
+
+const LAZIM_AUDIO={
+  l01:"Al-Fatihah.mp3",
+  l02:"Al-Qadr.mp3",
+  l03:"Al-Qariah.mp3",
+  l04:"At-Takathur.mp3",
+  l05:"Al-Humazah.mp3",
+  l06:"Al-Fil.mp3",
+  l07:"Quraysh.mp3",
+  l08:"Al-Maun.mp3",
+  l09:"Al-Kawthar.mp3",
+  l10:"Al-Kafirun.mp3",
+  l11:"An-Nasr.mp3",
+  l12:"Al-Masad.mp3",
+  l13:"Al-Ikhlas.mp3",
+  l14:"Al-Falaq.mp3",
+  l15:"An-Naas.mp3"
+};
 
 /* ===================================================================
    WIRID (PENDEK) & WIRID (PANJANG)
@@ -841,7 +952,7 @@ function goBack(){
 }
 
 function openGrid(sec){
-  section=sec; cards=sec==='solat'?SOLAT:sec==='wirid'?WIRID:sec==='wpendek'?WIRID_PENDEK:sec==='wpanjang'?WIRID_PANJANG:sec==='mathurat'?MATHURAT:HARIAN; fromGrid=true;
+  section=sec; cards=sec==='solat'?SOLAT:sec==='wirid'?WIRID:sec==='wpendek'?WIRID_PENDEK:sec==='wpanjang'?WIRID_PANJANG:sec==='mathurat'?MATHURAT:sec==='lazim'?LAZIM:HARIAN; fromGrid=true;
   const gh=document.getElementById('gridHeader');
   const gt=document.getElementById('gridTitle');
   const gs=document.getElementById('gridSub');
@@ -864,7 +975,7 @@ function openGrid(sec){
 }
 
 function openDirect(sec){
-  section=sec; cards=sec==='solat'?SOLAT:sec==='harian'?HARIAN:sec==='mathurat'?MATHURAT:sec==='wpendek'?WIRID_PENDEK:sec==='wpanjang'?WIRID_PANJANG:WIRID; fromGrid=false; current=0;
+  section=sec; cards=sec==='solat'?SOLAT:sec==='harian'?HARIAN:sec==='mathurat'?MATHURAT:sec==='wpendek'?WIRID_PENDEK:sec==='wpanjang'?WIRID_PANJANG:sec==='lazim'?LAZIM:WIRID; fromGrid=false; current=0;
   setupCardView(sec,0); showView('v-card');
 }
 
@@ -926,6 +1037,7 @@ function renderCard(idx){
   else if(t==='wpanjang'&&typeof PANJANG_AUDIO!=='undefined'&&PANJANG_AUDIO[c.id]){audioFile=PANJANG_AUDIO[c.id];audioDir='./audio';}
   else if(t==='wpendek'&&typeof PENDEK_AUDIO!=='undefined'&&PENDEK_AUDIO[c.id]){audioFile=PENDEK_AUDIO[c.id];audioDir='./audio';}
   else if(t==='solat'&&typeof SOLAT_AUDIO!=='undefined'&&SOLAT_AUDIO[c.id]){audioFile=SOLAT_AUDIO[c.id];audioDir='./audio';}
+  else if(t==='lazim'&&typeof LAZIM_AUDIO!=='undefined'&&LAZIM_AUDIO[c.id]){audioFile=LAZIM_AUDIO[c.id];audioDir='./audio';}
   const audioBar=audioFile?`<div class="audio-bar ${t}" id="audioBar"><button class="audio-btn" id="audioBtn" aria-label="Main audio">▶</button><div class="audio-prog" id="audioProg"><div class="audio-prog-fill" id="audioProgFill"></div></div><span class="audio-time" id="audioTime">0:00</span></div>`:'';
 
   let arabSec='';
@@ -1037,6 +1149,8 @@ document.addEventListener('touchend',e=>{
   if(cwk) cwk.textContent=WIRID_PENDEK.length+' kad';
   var cwp=document.getElementById('cntWPanjang');
   if(cwp) cwp.textContent=WIRID_PANJANG.length+' kad';
+  var cl=document.getElementById('cntLazim');
+  if(cl) cl.textContent=LAZIM.length+' kad';
 })();
 </script>
 <!-- Bar Muat Turun Offline -->
@@ -1065,7 +1179,7 @@ if('serviceWorker' in navigator){
    - Butang manual + progress bar. Fail sedia dalam cache akan dilangkau.
    - Gambar .jpg yang gagal akan dicuba semula sebagai .png (padan fallback <img>). */
 (function(){
-  var CACHE='panduan-ibadah-v5';
+  var CACHE='panduan-ibadah-v6';
   var busy=false;
 
   function el(id){return document.getElementById(id);}
